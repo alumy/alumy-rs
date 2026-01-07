@@ -1,0 +1,21 @@
+[package]
+name = "alumy"
+version = "0.1.0"
+edition = "2021"
+authors = ["jack <jackchanrs@gmail.com>"]
+description = "Rust SDK for embedded systems development, providing safe and efficient hardware abstraction and device control."
+license = "GPL-3.0"
+repository = "https://github.com/alumy/alumy-rs"
+homepage = "https://github.com/alumy/alumy-rs"
+documentation = "https://docs.rs/alumy"
+readme = "README.md"
+keywords = ["embedded", "hardware", "sdk", "no-std", "hal"]
+categories = ["embedded", "hardware-support", "no-std"]
+rust-version = "1.70"
+
+[dependencies]
+
+[dev-dependencies]
+
+[features]
+default = []
