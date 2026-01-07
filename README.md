@@ -34,7 +34,7 @@ fn main() {
 
 ## License
 
-This project is licensed under the [GPL-3.0 License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
 ## Contributing
 
