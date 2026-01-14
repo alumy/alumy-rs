@@ -1,25 +1,15 @@
+mod common;
 use alumy::log::log_init::{LogConfig, logger_init};
 use std::fs;
-use std::path::Path;
 use std::thread;
 use std::time::Duration;
-
-struct CleanupGuard(&'static str);
-impl Drop for CleanupGuard {
-    fn drop(&mut self) {
-        if Path::new(self.0).exists() {
-            let _ = fs::remove_dir_all(self.0);
-        }
-    }
-}
 
 #[test]
 fn test_log_params_full() {
     let log_dir = "test_logs_full";
     let log_file = "test_logs_full/test.log";
-    let _guard = CleanupGuard(log_dir);
-    
-    if Path::new(log_dir).exists() { let _ = fs::remove_dir_all(log_dir); }
+    let _guard = common::CleanupGuard(log_dir);
+    common::setup_log_dir(log_dir);
 
     let mut config = LogConfig::new(
         Some("test_full".to_string()),
