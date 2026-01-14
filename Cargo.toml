@@ -14,6 +14,13 @@ categories = ["embedded", "hardware-support", "no-std"]
 rust-version = "1.70"
 
 [dependencies]
+anyhow = "1.0.100"
+crossbeam = "0.8.4"
+libc = "0.2.180"
+rolling-file = "0.2.0"
+time = { version = "0.3.41", features = ["macros", "local-offset", "formatting"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "fmt", "local-time"] }
 
 [dev-dependencies]
 

@@ -42,15 +42,20 @@ mod tests {
 
     #[test]
     fn test_version() {
-        // Verify that version() matches the version in Cargo.toml
         assert_eq!(version(), env!("CARGO_PKG_VERSION"));
         assert_eq!(crate_version!(), env!("CARGO_PKG_VERSION"));
     }
 
     #[test]
     fn test_name() {
-        // Verify that name() matches the crate name
         assert_eq!(name(), "alumy");
         assert_eq!(crate_name!(), "alumy");
+    }
+
+    #[test]
+    fn test_hello() {
+        let greeting = hello();
+        assert!(greeting.contains("alumy"));
+        assert!(greeting.contains(env!("CARGO_PKG_VERSION")));
     }
 }
