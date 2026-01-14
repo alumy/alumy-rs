@@ -1,3 +1,6 @@
+/// Returns the system uptime in seconds.
+/// 
+/// Uses `libc::sysinfo` to retrieve the uptime.
 pub fn uptime() -> u64 {
     let mut info: libc::sysinfo = unsafe { std::mem::zeroed() };
 
@@ -8,25 +11,10 @@ pub fn uptime() -> u64 {
     info.uptime as u64
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_uptime() {
-        // We can't easily test failure of libc::sysinfo, but we can test that it returns a non-zero value
-        // (assuming the system has been up for at least 1 second)
-        let u = uptime();
-        assert!(u > 0);
-    }
-
-    #[test]
-    fn test_uptime_duration() {
-        let d = uptime_duration();
-        assert!(d.as_secs() > 0);
-    }
-}
-
+/// Returns the system uptime as a `Duration`.
+/// 
+/// Tries to use `libc::clock_gettime` with `CLOCK_MONOTONIC` for high precision,
+/// falling back to `uptime()` if it fails.
 pub fn uptime_duration() -> std::time::Duration {
     let mut ts = libc::timespec {
         tv_sec: 0,
@@ -37,5 +25,22 @@ pub fn uptime_duration() -> std::time::Duration {
         std::time::Duration::new(ts.tv_sec as u64, ts.tv_nsec as u32)
     } else {
         std::time::Duration::from_secs(uptime())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_uptime() {
+        let u = uptime();
+        assert!(u > 0);
+    }
+
+    #[test]
+    fn test_uptime_duration() {
+        let d = uptime_duration();
+        assert!(d.as_secs() > 0);
     }
 }

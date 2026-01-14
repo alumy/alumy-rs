@@ -8,9 +8,10 @@ Rust SDK for embedded systems development, providing safe and efficient hardware
 
 ## Features
 
+- **Advanced Logging**: A high-performance, non-blocking logger with fluent configuration API, log rotation, and system uptime timestamps.
+- **System Utilities**: Helpers for system information like uptime.
+- **Filesystem Utilities**: Size parsing/formatting and path building helpers.
 - **Version Management**: Macros and functions to access crate metadata at compile time.
-- **Filesystem Utilities**: Path building and filesystem helpers (under development).
-- **Embedded Focused**: Designed for `no_std` environments and efficient hardware control.
 
 ## Installation
 
@@ -23,29 +24,68 @@ alumy = "0.1"
 
 ## Usage
 
-### Version Information
+### Logging Setup
 
-You can access the crate version and name using functions or macros:
+Alumy provides a modern, non-blocking logger based on `tracing`. It supports a fluent API for easy configuration:
 
 ```rust
-use alumy::version;
+use alumy::LogConfig;
 
-fn main() {
-    println!("Crate: {}", version::name());
-    println!("Version: {}", version::version());
-    println!("{}", version::hello());
+fn main() -> anyhow::Result<()> {
+    // Basic setup
+    LogConfig::new("my-app", "info").init()?;
+
+    // Advanced setup with log rotation and system uptime
+    LogConfig::new("my-app", "debug")
+        .with_file("logs/app.log", "10M", 5)
+        .with_time_format("uptime")
+        .with_ansi(true)
+        .with_target(true)
+        .init()?;
+
+    tracing::info!("Hello, alumy logger!");
+    Ok(())
 }
 ```
 
-### Macros
+### System Uptime
 
-The crate provides macros for compile-time constants:
+Access system uptime information:
 
 ```rust
+use alumy::sys::uptime;
+
+fn main() {
+    println!("Uptime: {} seconds", uptime::uptime());
+    println!("Uptime duration: {:?}", uptime::uptime_duration());
+}
+```
+
+### Filesystem Utilities
+
+Parse and format file sizes easily:
+
+```rust
+use alumy::fs::filesize;
+
+fn main() {
+    let size = filesize::parse_size("10M").unwrap();
+    println!("10M in bytes: {}", size);
+    println!("Formatted: {}", filesize::format_size(size)); // "10.0MB"
+}
+```
+
+### Version Information
+
+Access crate metadata:
+
+```rust
+use alumy::version;
 use alumy::{crate_name, crate_version};
 
 fn main() {
     println!("Running {} v{}", crate_name!(), crate_version!());
+    println!("{}", version::hello());
 }
 ```
 

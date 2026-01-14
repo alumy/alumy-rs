@@ -11,22 +11,17 @@ fn test_log_params_full() {
     let _guard = common::CleanupGuard(log_dir);
     common::setup_log_dir(log_dir);
 
-    let mut config = LogConfig::new(
-        Some("test_full".to_string()),
-        Some(log_file.to_string()),
-        Some("debug".to_string()),
-        Some("1M".to_string()),
-        Some(2),
-    );
-    config.display_target = Some(true);
-    config.display_level = Some(true);
-    config.display_time = Some(true);
-    config.display_thread_name = Some(true);
-    config.display_thread_id = Some(true);
-    config.time_format = Some("uptime".to_string());
-    config.ansi = Some(true);
+    let config = LogConfig::new("test_full", "debug")
+        .with_file(log_file, "1M", 2)
+        .with_target(true)
+        .with_level_display(true)
+        .with_time(true)
+        .with_thread_name(true)
+        .with_thread_id(true)
+        .with_time_format("uptime")
+        .with_ansi(true);
 
-    logger_init(&config).expect("Failed to initialize logger");
+    config.init().expect("Failed to initialize logger");
 
     let handle = thread::Builder::new()
         .name("full-feat-thread".to_string())

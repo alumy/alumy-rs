@@ -1,4 +1,4 @@
-use alumy::log::log_init::{LogConfig, logger_init};
+use alumy::log::log_init::LogConfig;
 use std::fs;
 use std::path::Path;
 use std::thread;
@@ -6,24 +6,19 @@ use std::time::Duration;
 
 #[test]
 fn test_log_file_writing() {
-    let log_dir = "test_logs";
-    let log_file = "test_logs/test_write.log";
+    let log_dir = "test_logs_write_basic";
+    let log_file = "test_logs_write_basic/test_write.log";
     
     // Clean up before test
     if Path::new(log_dir).exists() {
         let _ = fs::remove_dir_all(log_dir);
     }
 
-    let config = LogConfig::new(
-        Some("test_write".to_string()),
-        Some(log_file.to_string()),
-        Some("info".to_string()),
-        Some("1M".to_string()),
-        Some(2),
-    );
+    let config = LogConfig::new("test_write", "info")
+        .with_file(log_file, "1M", 2);
 
     // Initialize logger
-    let init_result = logger_init(&config);
+    let init_result = config.init();
     assert!(init_result.is_ok(), "Failed to initialize logger: {:?}", init_result.err());
 
     // Write a log message

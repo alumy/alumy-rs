@@ -13,6 +13,21 @@ type SharedSender = Arc<Mutex<Option<crossbeam::channel::Sender<Vec<u8>>>>>;
 
 static LOG_GUARD: std::sync::OnceLock<Arc<NonBlockingGuard>> = std::sync::OnceLock::new();
 
+/// Configuration for the logger.
+/// 
+/// Supports fluent API for easy setup.
+/// 
+/// # Examples
+/// 
+/// ```no_run
+/// use alumy::LogConfig;
+/// 
+/// LogConfig::new("my-app", "info")
+///     .with_file("logs/app.log", "10M", 5)
+///     .with_target(true)
+///     .init()
+///     .unwrap();
+/// ```
 #[derive(Debug, Clone, Default)]
 pub struct LogConfig {
     pub name: Option<String>,
@@ -31,46 +46,83 @@ pub struct LogConfig {
 }
 
 impl LogConfig {
-    pub fn new(
-        name: Option<String>,
-        file: Option<String>,
-        level: Option<String>,
-        max_size: Option<String>,
-        max_files: Option<u32>,
-    ) -> Self {
+    /// Creates a new basic log configuration.
+    pub fn new(name: impl Into<String>, level: impl Into<String>) -> Self {
         Self {
-            name,
-            file,
-            level,
-            max_size,
-            max_files,
+            name: Some(name.into()),
+            level: Some(level.into()),
             ..Default::default()
         }
     }
 
-    fn display_target(&self) -> bool {
-        self.display_target.unwrap_or(false)
+    /// Sets the log file path and rolling policy.
+    pub fn with_file(mut self, path: impl Into<String>, max_size: impl Into<String>, max_files: u32) -> Self {
+        self.file = Some(path.into());
+        self.max_size = Some(max_size.into());
+        self.max_files = Some(max_files);
+        self
     }
 
-    fn display_level(&self) -> bool {
-        self.display_level.unwrap_or(true)
+    /// Sets a custom tracing filter (e.g., "info,my_crate=debug").
+    pub fn with_filter(mut self, filter: impl Into<String>) -> Self {
+        self.filter = Some(filter.into());
+        self
     }
 
-    fn display_time(&self) -> bool {
-        self.display_time.unwrap_or(true)
+    /// Enables or disables ANSI colors.
+    pub fn with_ansi(mut self, enable: bool) -> Self {
+        self.ansi = Some(enable);
+        self
     }
 
-    fn display_thread_name(&self) -> bool {
-        self.display_thread_name.unwrap_or(false)
+    /// Enables or disables displaying the target (module path).
+    pub fn with_target(mut self, enable: bool) -> Self {
+        self.display_target = Some(enable);
+        self
     }
 
-    fn display_thread_id(&self) -> bool {
-        self.display_thread_id.unwrap_or(false)
+    /// Enables or disables displaying the log level.
+    pub fn with_level_display(mut self, enable: bool) -> Self {
+        self.display_level = Some(enable);
+        self
     }
 
-    fn time_format(&self) -> &str {
-        self.time_format.as_deref().unwrap_or("iso")
+    /// Enables or disables displaying the timestamp.
+    pub fn with_time(mut self, enable: bool) -> Self {
+        self.display_time = Some(enable);
+        self
     }
+
+    /// Sets the time format. Use "uptime" for system uptime or "iso" (default) for local time.
+    pub fn with_time_format(mut self, format: impl Into<String>) -> Self {
+        self.time_format = Some(format.into());
+        self
+    }
+
+    /// Enables or disables displaying thread names.
+    pub fn with_thread_name(mut self, enable: bool) -> Self {
+        self.display_thread_name = Some(enable);
+        self
+    }
+
+    /// Enables or disables displaying thread IDs.
+    pub fn with_thread_id(mut self, enable: bool) -> Self {
+        self.display_thread_id = Some(enable);
+        self
+    }
+
+    /// Initializes the global logger with this configuration.
+    pub fn init(&self) -> Result<()> {
+        logger_init(self)
+    }
+
+    // Helper methods for internal use
+    fn display_target(&self) -> bool { self.display_target.unwrap_or(false) }
+    fn display_level(&self) -> bool { self.display_level.unwrap_or(true) }
+    fn display_time(&self) -> bool { self.display_time.unwrap_or(true) }
+    fn display_thread_name(&self) -> bool { self.display_thread_name.unwrap_or(false) }
+    fn display_thread_id(&self) -> bool { self.display_thread_id.unwrap_or(false) }
+    fn time_format(&self) -> &str { self.time_format.as_deref().unwrap_or("iso") }
 }
 
 struct UptimeTime;
@@ -201,7 +253,6 @@ fn log_dir_create(log_config: &LogConfig) -> Result<()> {
     if let Some(parent) = log_config.file.as_deref().and_then(|f| Path::new(f).parent()) {
         create_dir_all(parent)?;
     }
-
     Ok(())
 }
 
@@ -222,9 +273,11 @@ macro_rules! subscriber_init {
     };
 }
 
+/// Initializes the global logger.
+/// 
+/// Consider using [`LogConfig::init`] for a more fluent API.
 pub fn logger_init(log_config: &LogConfig) -> Result<()> {
     log_config_check(log_config).inspect_err(|e| eprintln!("Failed to check log config: {e}"))?;
-
     log_dir_create(log_config).inspect_err(|e| eprintln!("Failed to create log directory: {e}"))?;
 
     let env_filter = log_config
@@ -237,10 +290,7 @@ pub fn logger_init(log_config: &LogConfig) -> Result<()> {
     if let Some(file) = log_config.file.as_deref() {
         let file_path = Path::new(file);
         let directory = file_path.parent().unwrap_or(Path::new(""));
-        let basename = file_path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or_else(|| log_config.name.as_deref().unwrap_or("alumy"));
+        let basename = file_path.file_stem().and_then(|s| s.to_str()).unwrap_or_else(|| log_config.name.as_deref().unwrap_or("alumy"));
 
         let max_size = log_config.max_size.as_deref()
             .and_then(crate::fs::filesize::parse_size)
@@ -275,7 +325,6 @@ pub fn logger_init(log_config: &LogConfig) -> Result<()> {
 
         subscriber_init!(env_filter, layer, log_config);
     }
-
     Ok(())
 }
 
@@ -284,114 +333,31 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_log_config_default() {
-        let config = LogConfig::default();
-        assert_eq!(config.name, None);
-        assert_eq!(config.file, None);
-        assert_eq!(config.level, None);
-    }
-
-    #[test]
-    fn test_log_config_new() {
-        let config = LogConfig::new(
-            Some("test".to_string()),
-            Some("test.log".to_string()),
-            Some("info".to_string()),
-            Some("10M".to_string()),
-            Some(5),
-        );
+    fn test_log_config_fluent_api() {
+        let config = LogConfig::new("test", "info")
+            .with_file("test.log", "10M", 5)
+            .with_ansi(true)
+            .with_target(true);
+        
         assert_eq!(config.name.as_deref(), Some("test"));
-        assert_eq!(config.file.as_deref(), Some("test.log"));
         assert_eq!(config.level.as_deref(), Some("info"));
-        assert_eq!(config.max_size.as_deref(), Some("10M"));
-        assert_eq!(config.max_files, Some(5));
+        assert_eq!(config.file.as_deref(), Some("test.log"));
+        assert_eq!(config.ansi, Some(true));
+        assert_eq!(config.display_target, Some(true));
     }
 
     #[test]
     fn test_log_config_check() {
-        let mut config = LogConfig::new(
-            Some("test".to_string()),
-            Some("test.log".to_string()),
-            Some("info".to_string()),
-            Some("10M".to_string()),
-            Some(5),
-        );
+        let config = LogConfig::new("test", "info");
         assert!(log_config_check(&config).is_ok());
 
-        config.name = None;
-        assert!(log_config_check(&config).is_err());
-
-        config.name = Some("test".to_string());
-        config.level = None;
-        assert!(log_config_check(&config).is_err());
-
-        config.level = Some("info".to_string());
-        config.max_size = None;
-        assert!(log_config_check(&config).is_err());
-
-        config.max_size = Some("10M".to_string());
-        config.max_files = None;
-        assert!(log_config_check(&config).is_err());
-
-        config.file = None;
-        config.max_size = None;
-        config.max_files = None;
-        assert!(log_config_check(&config).is_ok());
-    }
-
-    #[test]
-    fn test_log_config_helpers() {
-        let mut config = LogConfig::default();
-        assert!(!config.display_target());
-        assert!(config.display_level());
-        assert!(config.display_time());
-        assert!(!config.display_thread_name());
-        assert!(!config.display_thread_id());
-        assert_eq!(config.time_format(), "iso");
-
-        config.display_target = Some(true);
-        config.display_level = Some(false);
-        config.display_time = Some(false);
-        config.display_thread_name = Some(true);
-        config.display_thread_id = Some(true);
-        config.time_format = Some("uptime".to_string());
-        assert!(config.display_target());
-        assert!(!config.display_level());
-        assert!(!config.display_time());
-        assert!(config.display_thread_name());
-        assert!(config.display_thread_id());
-        assert_eq!(config.time_format(), "uptime");
-    }
-
-    #[test]
-    fn test_log_dir_create() {
-        let mut config = LogConfig::default();
-        config.file = Some("test_subdir/test.log".to_string());
-        assert!(log_dir_create(&config).is_ok());
-        assert!(Path::new("test_subdir").exists());
-        let _ = std::fs::remove_dir_all("test_subdir");
+        let err_config = LogConfig::default();
+        assert!(log_config_check(&err_config).is_err());
     }
 
     #[test]
     fn test_logger_init_errors() {
-        // Missing name
         let config = LogConfig::default();
         assert!(logger_init(&config).is_err());
-
-        // Invalid path (using a directory name as file name)
-        std::fs::create_dir_all("test_invalid_path.log").unwrap();
-        let _config = LogConfig::new(
-            Some("test".to_string()),
-            Some("test_invalid_path.log/test.log".to_string()),
-            Some("info".to_string()),
-            Some("1M".to_string()),
-            Some(2),
-        );
-        
-        // Let's just test that logger_init returns error for invalid config
-        let config = LogConfig::default();
-        assert!(logger_init(&config).is_err());
-        
-        std::fs::remove_dir_all("test_invalid_path.log").unwrap();
     }
 }

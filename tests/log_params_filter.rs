@@ -1,5 +1,5 @@
 mod common;
-use alumy::log::log_init::{LogConfig, logger_init};
+use alumy::log::log_init::LogConfig;
 use std::fs;
 use std::time::Duration;
 use std::thread;
@@ -11,17 +11,12 @@ fn test_log_params_filter() {
     let _guard = common::CleanupGuard(log_dir);
     common::setup_log_dir(log_dir);
 
-    let mut config = LogConfig::new(
-        Some("test_filter".to_string()),
-        Some(log_file.to_string()),
-        Some("info".to_string()),
-        Some("1M".to_string()),
-        Some(2),
-    );
-    config.filter = Some("info,target_debug=debug".to_string());
-    config.display_level = Some(true);
+    let config = LogConfig::new("test_filter", "info")
+        .with_file(log_file, "1M", 2)
+        .with_filter("info,target_debug=debug")
+        .with_level_display(true);
 
-    logger_init(&config).expect("Failed to initialize logger");
+    config.init().expect("Failed to initialize logger");
 
     tracing::debug!(target: "target_debug", "Debug message should appear");
     tracing::debug!("Debug message should NOT appear");

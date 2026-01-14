@@ -1,5 +1,5 @@
 mod common;
-use alumy::log::log_init::{LogConfig, logger_init};
+use alumy::log::log_init::LogConfig;
 use std::fs;
 use std::time::Duration;
 use std::thread;
@@ -11,15 +11,10 @@ fn test_log_params_rolling() {
     let _guard = common::CleanupGuard(log_dir);
     common::setup_log_dir(log_dir);
 
-    let config = LogConfig::new(
-        Some("test_rolling".to_string()),
-        Some(log_file.to_string()),
-        Some("info".to_string()),
-        Some("500".to_string()),
-        Some(3),
-    );
+    let config = LogConfig::new("test_rolling", "info")
+        .with_file(log_file, "500", 3);
 
-    logger_init(&config).expect("Failed to initialize logger");
+    config.init().expect("Failed to initialize logger");
 
     for i in 0..20 {
         tracing::info!("Rolling message {:02} with enough content", i);

@@ -1,5 +1,5 @@
 mod common;
-use alumy::log::log_init::{LogConfig, logger_init};
+use alumy::log::log_init::LogConfig;
 use std::fs;
 use std::thread;
 use std::time::Duration;
@@ -11,21 +11,16 @@ fn test_log_params_none() {
     let _guard = common::CleanupGuard(log_dir);
     common::setup_log_dir(log_dir);
 
-    let mut config = LogConfig::new(
-        Some("test_none".to_string()),
-        Some(log_file.to_string()),
-        Some("info".to_string()),
-        Some("1M".to_string()),
-        Some(2),
-    );
-    config.display_target = Some(false);
-    config.display_level = Some(false);
-    config.display_time = Some(false);
-    config.display_thread_name = Some(false);
-    config.display_thread_id = Some(false);
-    config.ansi = Some(false);
+    let config = LogConfig::new("test_none", "info")
+        .with_file(log_file, "1M", 2)
+        .with_target(false)
+        .with_level_display(false)
+        .with_time(false)
+        .with_thread_name(false)
+        .with_thread_id(false)
+        .with_ansi(false);
 
-    logger_init(&config).expect("Failed to initialize logger");
+    config.init().expect("Failed to initialize logger");
 
     let handle = thread::Builder::new()
         .name("hidden-thread".to_string())
