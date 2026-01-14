@@ -6,3 +6,5 @@ pub mod version;
 pub mod fs;
 pub mod sys;
 pub mod log;
+
+pub use log::{LogConfig, logger_init};
