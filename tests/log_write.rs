@@ -1,4 +1,4 @@
-use alumy::log::log_init::LogConfig;
+use alumy::log::LogConfig;
 use std::fs;
 use std::path::Path;
 use std::thread;
