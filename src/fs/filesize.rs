@@ -25,6 +25,30 @@ pub fn parse_size(size_str: &str) -> Option<u64> {
     val_str.trim().parse::<u64>().ok().map(|v| v * multiplier)
 }
 
+/// Formats a byte count into a human-readable string (e.g., "10.5MB", "1.2GB").
+/// All units are treated as binary (base 1024).
+pub fn format_size(bytes: u64) -> String {
+    const KIB: u64 = 1024;
+    const MIB: u64 = KIB * 1024;
+    const GIB: u64 = MIB * 1024;
+    const TIB: u64 = GIB * 1024;
+    const PIB: u64 = TIB * 1024;
+
+    if bytes < KIB {
+        format!("{}B", bytes)
+    } else if bytes < MIB {
+        format!("{:.1}KB", bytes as f64 / KIB as f64)
+    } else if bytes < GIB {
+        format!("{:.1}MB", bytes as f64 / MIB as f64)
+    } else if bytes < TIB {
+        format!("{:.1}GB", bytes as f64 / GIB as f64)
+    } else if bytes < PIB {
+        format!("{:.1}TB", bytes as f64 / TIB as f64)
+    } else {
+        format!("{:.1}PB", bytes as f64 / PIB as f64)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -66,5 +90,16 @@ mod tests {
         assert_eq!(parse_size(""), None);
         assert_eq!(parse_size("1.5G"), None);
         assert_eq!(parse_size("-1024"), None);
+    }
+
+    #[test]
+    fn test_format_size() {
+        assert_eq!(format_size(512), "512B");
+        assert_eq!(format_size(1024), "1.0KB");
+        assert_eq!(format_size(1024 * 1024), "1.0MB");
+        assert_eq!(format_size(1024 * 1024 * 1024), "1.0GB");
+        assert_eq!(format_size(1024u64.pow(4)), "1.0TB");
+        assert_eq!(format_size(1024u64.pow(5)), "1.0PB");
+        assert_eq!(format_size(1536), "1.5KB");
     }
 }
