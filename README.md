@@ -8,10 +8,9 @@ Rust SDK for embedded systems development, providing safe and efficient hardware
 
 ## Features
 
-- Safe hardware abstraction layer
-- Efficient device control interfaces
-- Support for `no_std` environments
-- Modular and extensible design
+- **Version Management**: Macros and functions to access crate metadata at compile time.
+- **Filesystem Utilities**: Path building and filesystem helpers (under development).
+- **Embedded Focused**: Designed for `no_std` environments and efficient hardware control.
 
 ## Installation
 
@@ -24,11 +23,29 @@ alumy = "0.1"
 
 ## Usage
 
+### Version Information
+
+You can access the crate version and name using functions or macros:
+
 ```rust
-use alumy;
+use alumy::version;
 
 fn main() {
-    println!("{}", alumy::hello());
+    println!("Crate: {}", version::name());
+    println!("Version: {}", version::version());
+    println!("{}", version::hello());
+}
+```
+
+### Macros
+
+The crate provides macros for compile-time constants:
+
+```rust
+use alumy::{crate_name, crate_version};
+
+fn main() {
+    println!("Running {} v{}", crate_name!(), crate_version!());
 }
 ```
 
