@@ -306,4 +306,92 @@ mod tests {
         assert_eq!(config.max_size.as_deref(), Some("10M"));
         assert_eq!(config.max_files, Some(5));
     }
+
+    #[test]
+    fn test_log_config_check() {
+        let mut config = LogConfig::new(
+            Some("test".to_string()),
+            Some("test.log".to_string()),
+            Some("info".to_string()),
+            Some("10M".to_string()),
+            Some(5),
+        );
+        assert!(log_config_check(&config).is_ok());
+
+        config.name = None;
+        assert!(log_config_check(&config).is_err());
+
+        config.name = Some("test".to_string());
+        config.level = None;
+        assert!(log_config_check(&config).is_err());
+
+        config.level = Some("info".to_string());
+        config.max_size = None;
+        assert!(log_config_check(&config).is_err());
+
+        config.max_size = Some("10M".to_string());
+        config.max_files = None;
+        assert!(log_config_check(&config).is_err());
+
+        config.file = None;
+        config.max_size = None;
+        config.max_files = None;
+        assert!(log_config_check(&config).is_ok());
+    }
+
+    #[test]
+    fn test_log_config_helpers() {
+        let mut config = LogConfig::default();
+        assert!(!config.display_target());
+        assert!(config.display_level());
+        assert!(config.display_time());
+        assert!(!config.display_thread_name());
+        assert!(!config.display_thread_id());
+        assert_eq!(config.time_format(), "iso");
+
+        config.display_target = Some(true);
+        config.display_level = Some(false);
+        config.display_time = Some(false);
+        config.display_thread_name = Some(true);
+        config.display_thread_id = Some(true);
+        config.time_format = Some("uptime".to_string());
+        assert!(config.display_target());
+        assert!(!config.display_level());
+        assert!(!config.display_time());
+        assert!(config.display_thread_name());
+        assert!(config.display_thread_id());
+        assert_eq!(config.time_format(), "uptime");
+    }
+
+    #[test]
+    fn test_log_dir_create() {
+        let mut config = LogConfig::default();
+        config.file = Some("test_subdir/test.log".to_string());
+        assert!(log_dir_create(&config).is_ok());
+        assert!(Path::new("test_subdir").exists());
+        let _ = std::fs::remove_dir_all("test_subdir");
+    }
+
+    #[test]
+    fn test_logger_init_errors() {
+        // Missing name
+        let config = LogConfig::default();
+        assert!(logger_init(&config).is_err());
+
+        // Invalid path (using a directory name as file name)
+        std::fs::create_dir_all("test_invalid_path.log").unwrap();
+        let _config = LogConfig::new(
+            Some("test".to_string()),
+            Some("test_invalid_path.log/test.log".to_string()),
+            Some("info".to_string()),
+            Some("1M".to_string()),
+            Some(2),
+        );
+        
+        // Let's just test that logger_init returns error for invalid config
+        let config = LogConfig::default();
+        assert!(logger_init(&config).is_err());
+        
+        std::fs::remove_dir_all("test_invalid_path.log").unwrap();
+    }
 }

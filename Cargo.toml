@@ -1,6 +1,6 @@
 [package]
 name = "alumy"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
 description = "Rust SDK for embedded systems development, providing safe and efficient hardware abstraction and device control."
