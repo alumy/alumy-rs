@@ -14,4 +14,5 @@ pub mod fs;
 pub mod sys;
 pub mod log;
 
-pub use log::{LogConfig, logger_init};
+#[doc(inline)]
+pub use log::LogConfig;

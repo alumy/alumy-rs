@@ -1,5 +1,5 @@
 mod common;
-use alumy::log::{LogConfig, logger_init};
+use alumy::log::LogConfig;
 use std::fs;
 use std::thread;
 use std::time::Duration;

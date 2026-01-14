@@ -1,3 +1,5 @@
+#[doc(hidden)]
 mod log_init;
 
-pub use log_init::{LogConfig, logger_init};
+#[doc(inline)]
+pub use log_init::LogConfig;

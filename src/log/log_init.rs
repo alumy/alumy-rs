@@ -275,8 +275,8 @@ macro_rules! subscriber_init {
 
 /// Initializes the global logger.
 /// 
-/// Consider using [`LogConfig::init`] for a more fluent API.
-pub fn logger_init(log_config: &LogConfig) -> Result<()> {
+/// This is an internal function used by [`LogConfig::init`].
+pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
     log_config_check(log_config).inspect_err(|e| eprintln!("Failed to check log config: {e}"))?;
     log_dir_create(log_config).inspect_err(|e| eprintln!("Failed to create log directory: {e}"))?;
 
