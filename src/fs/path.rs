@@ -1,5 +1,5 @@
 /// Macro to build a path in the format: `dir/name/name.suffix`
-#[allow(unused_macros)]
+#[macro_export]
 macro_rules! build_path {
     ($dir:expr, $name:expr, $suffix:expr) => {
         concat!($dir, "/", $name, "/", $name, $suffix)
