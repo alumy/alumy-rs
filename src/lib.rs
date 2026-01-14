@@ -1,34 +1,6 @@
 //! # alumy
 //!
-//! A Rust library.
-//!
-//! ## Example
-//!
-//! ```rust
-//! use alumy;
-//!
-//! // Your example code here
-//! ```
+//! Rust SDK for embedded systems development, providing safe and efficient hardware abstraction and device control.
 
-/// Returns a greeting message.
-///
-/// # Examples
-///
-/// ```
-/// let greeting = alumy::hello();
-/// assert_eq!(greeting, "Hello from alumy!");
-/// ```
-pub fn hello() -> &'static str {
-    "Hello from alumy!"
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_hello() {
-        assert_eq!(hello(), "Hello from alumy!");
-    }
-}
-
+pub mod version;
+pub mod fs;
