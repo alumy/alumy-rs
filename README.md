@@ -4,7 +4,7 @@
 [![Documentation](https://docs.rs/alumy/badge.svg)](https://docs.rs/alumy)
 [![License](https://img.shields.io/crates/l/alumy.svg)](https://github.com/alumy/alumy-rs/blob/main/LICENSE)
 
-An easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
+A batteries-included Rust SDK for rapid application development. Logging, system utilities, and filesystem helpers — all ready to use.
 
 ## Features
 
@@ -19,14 +19,15 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-alumy = "0.1"
+alumy = "0.1.10"
+anyhow = "1"
 ```
 
 ## Usage
 
 ### Logging Setup
 
-Alumy provides a modern, non-blocking logger based on `tracing`. It supports a fluent API for easy configuration:
+Alumy provides a modern, non-blocking logger based on `tracing`. It re-exports all logging macros (`trace!`, `debug!`, `info!`, `warn!`, `error!`) for convenience:
 
 ```rust
 use alumy::{LogConfig, info, debug};

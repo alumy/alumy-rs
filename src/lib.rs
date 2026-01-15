@@ -1,6 +1,6 @@
 //! # alumy
 //!
-//! An easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
+//! A batteries-included Rust SDK for rapid application development. Logging, system utilities, and filesystem helpers — all ready to use.
 //!
 //! ## Modules
 //!
@@ -8,6 +8,11 @@
 //! - [`sys`]: System-level utilities like uptime.
 //! - [`fs`]: Filesystem utilities including size parsing and path building.
 //! - [`version`]: Crate metadata and version information.
+//!
+//! ## Re-exports
+//!
+//! This crate re-exports logging macros from `tracing` for convenience:
+//! `trace!`, `debug!`, `info!`, `warn!`, `error!`, and the `Level` enum.
 
 pub mod version;
 pub mod fs;
