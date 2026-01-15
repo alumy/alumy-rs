@@ -1,16 +1,16 @@
 [package]
 name = "alumy"
-version = "0.1.8"
+version = "0.1.9"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
-description = "Rust SDK for embedded systems development, providing safe and efficient hardware abstraction and device control."
+description = "A cross-platform easy-start SDK for Rust development. Provides essential libraries to accelerate application development."
 license = "MIT"
 repository = "https://github.com/alumy/alumy-rs"
 homepage = "https://github.com/alumy/alumy-rs"
 documentation = "https://docs.rs/alumy"
 readme = "README.md"
-keywords = ["embedded", "hardware", "sdk", "no-std", "hal"]
-categories = ["embedded", "hardware-support", "no-std"]
+keywords = ["cross-platform", "sdk", "utilities", "logging", "filesystem"]
+categories = ["development-tools", "os"]
 rust-version = "1.70"
 
 [dependencies]

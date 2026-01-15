@@ -4,12 +4,12 @@
 [![Documentation](https://docs.rs/alumy/badge.svg)](https://docs.rs/alumy)
 [![License](https://img.shields.io/crates/l/alumy.svg)](https://github.com/alumy/alumy-rs/blob/main/LICENSE)
 
-Rust SDK for embedded systems development, providing safe and efficient hardware abstraction and device control.
+A cross-platform easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
 
 ## Features
 
-- **Advanced Logging**: A high-performance, non-blocking logger with fluent configuration API, log rotation, and system uptime timestamps.
-- **System Utilities**: Helpers for system information like uptime.
+- **High-Performance Logging**: Non-blocking logger based on `tracing` with fluent configuration API, log rotation, and system uptime timestamps. Works across platforms.
+- **System Utilities**: Helpers for system information such as uptime (supports Linux, macOS, and Windows).
 - **Filesystem Utilities**: Size parsing/formatting and path building helpers.
 - **Version Management**: Macros and functions to access crate metadata at compile time.
 

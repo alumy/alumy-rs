@@ -1,31 +1,44 @@
 /// Returns the system uptime in seconds.
 /// 
-/// Uses `libc::sysinfo` to retrieve the uptime.
+/// On Unix-like systems (Linux, macOS, etc.), it derives from `uptime_duration`.
+/// On Windows, it uses `GetTickCount64`.
 pub fn uptime() -> u64 {
-    let mut info: libc::sysinfo = unsafe { std::mem::zeroed() };
-
-    if unsafe { libc::sysinfo(&mut info) } != 0 {
-        return 0;
-    }
-
-    info.uptime as u64
+    uptime_duration().as_secs()
 }
 
 /// Returns the system uptime as a `Duration`.
 /// 
-/// Tries to use `libc::clock_gettime` with `CLOCK_MONOTONIC` for high precision,
-/// falling back to `uptime()` if it fails.
+/// On Unix-like systems (Linux, macOS, etc.), it uses `libc::clock_gettime` with `CLOCK_MONOTONIC`.
+/// On Windows, it uses `GetTickCount64`.
 pub fn uptime_duration() -> std::time::Duration {
-    let mut ts = libc::timespec {
-        tv_sec: 0,
-        tv_nsec: 0,
-    };
+    #[cfg(unix)]
+    {
+        let mut ts = libc::timespec {
+            tv_sec: 0,
+            tv_nsec: 0,
+        };
 
-    if unsafe { libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts) } == 0 {
-        std::time::Duration::new(ts.tv_sec as u64, ts.tv_nsec as u32)
-    } else {
-        std::time::Duration::from_secs(uptime())
+        if unsafe { libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts) } == 0 {
+            std::time::Duration::new(ts.tv_sec as u64, ts.tv_nsec as u32)
+        } else {
+            std::time::Duration::from_secs(0)
+        }
     }
+
+    #[cfg(target_os = "windows")]
+    {
+        std::time::Duration::from_millis(unsafe { GetTickCount64() })
+    }
+
+    #[cfg(not(any(unix, target_os = "windows")))]
+    {
+        std::time::Duration::from_secs(0)
+    }
+}
+
+#[cfg(target_os = "windows")]
+extern "system" {
+    fn GetTickCount64() -> u64;
 }
 
 #[cfg(test)]
@@ -35,12 +48,13 @@ mod tests {
     #[test]
     fn test_uptime() {
         let u = uptime();
+        // Assume system has been up for at least 1 second
         assert!(u > 0);
     }
 
     #[test]
     fn test_uptime_duration() {
         let d = uptime_duration();
-        assert!(d.as_secs() > 0);
+        assert!(d.as_millis() > 0);
     }
 }

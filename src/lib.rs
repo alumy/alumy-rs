@@ -1,6 +1,6 @@
 //! # alumy
 //!
-//! Rust SDK for embedded systems development, providing safe and efficient hardware abstraction and device control.
+//! A cross-platform easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
 //!
 //! ## Modules
 //!
