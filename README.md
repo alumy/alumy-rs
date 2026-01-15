@@ -4,7 +4,7 @@
 [![Documentation](https://docs.rs/alumy/badge.svg)](https://docs.rs/alumy)
 [![License](https://img.shields.io/crates/l/alumy.svg)](https://github.com/alumy/alumy-rs/blob/main/LICENSE)
 
-A cross-platform easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
+An easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
 
 ## Features
 
@@ -29,7 +29,7 @@ alumy = "0.1"
 Alumy provides a modern, non-blocking logger based on `tracing`. It supports a fluent API for easy configuration:
 
 ```rust
-use alumy::LogConfig;
+use alumy::{LogConfig, info, debug};
 
 fn main() -> anyhow::Result<()> {
     // Basic setup
@@ -43,7 +43,8 @@ fn main() -> anyhow::Result<()> {
         .with_target(true)
         .init()?;
 
-    tracing::info!("Hello, alumy logger!");
+    info!("Hello, alumy logger!");
+    debug!("Debug message");
     Ok(())
 }
 ```

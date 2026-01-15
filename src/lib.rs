@@ -1,6 +1,6 @@
 //! # alumy
 //!
-//! A cross-platform easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
+//! An easy-start SDK for Rust development. Provides essential libraries to accelerate application development.
 //!
 //! ## Modules
 //!
@@ -16,3 +16,5 @@ pub mod log;
 
 #[doc(inline)]
 pub use log::LogConfig;
+
+pub use tracing::{trace, debug, info, warn, error, Level};

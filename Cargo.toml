@@ -1,9 +1,9 @@
 [package]
 name = "alumy"
-version = "0.1.9"
+version = "0.1.10"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
-description = "A cross-platform easy-start SDK for Rust development. Provides essential libraries to accelerate application development."
+description = "An easy-start SDK for Rust development. Provides essential libraries to accelerate application development."
 license = "MIT"
 repository = "https://github.com/alumy/alumy-rs"
 homepage = "https://github.com/alumy/alumy-rs"
