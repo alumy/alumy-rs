@@ -1,6 +1,6 @@
 [package]
 name = "alumy"
-version = "0.1.11"
+version = "0.1.12"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
 description = "A batteries-included Rust SDK for rapid application development. Logging, system utilities, and filesystem helpers — all ready to use."

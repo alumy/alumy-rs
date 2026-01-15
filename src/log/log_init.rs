@@ -250,8 +250,14 @@ fn log_config_check(log_config: &LogConfig) -> Result<()> {
 }
 
 fn log_dir_create(log_config: &LogConfig) -> Result<()> {
-    if let Some(parent) = log_config.file.as_deref().and_then(|f| Path::new(f).parent()) {
-        create_dir_all(parent)?;
+    if let Some(file) = log_config.file.as_deref() {
+        let path = Path::new(file);
+
+        if let Some(parent) = path.parent() {
+            if !parent.as_os_str().is_empty() {
+                create_dir_all(parent)?;
+            }
+        }
     }
     Ok(())
 }
@@ -289,15 +295,21 @@ pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
 
     if let Some(file) = log_config.file.as_deref() {
         let file_path = Path::new(file);
-        let directory = file_path.parent().unwrap_or(Path::new(""));
-        let basename = file_path.file_stem().and_then(|s| s.to_str()).unwrap_or_else(|| log_config.name.as_deref().unwrap_or("alumy"));
+        
+        let dir = file_path.parent()
+            .filter(|p| !p.as_os_str().is_empty())
+            .unwrap_or_else(|| Path::new("."));
+        
+        let basename = file_path.file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or_else(|| log_config.name.as_deref().unwrap_or("alumy"));
 
         let max_size = log_config.max_size.as_deref()
             .and_then(crate::fs::filesize::parse_size)
             .unwrap_or(1024 * 1024);
 
         let rolling_appender = BasicRollingFileAppender::new(
-            directory.join(format!("{basename}.log")),
+            dir.join(format!("{basename}.log")),
             RollingConditionBasic::new().max_size(max_size),
             log_config.max_files.unwrap_or(5).max(2) as usize,
         )
