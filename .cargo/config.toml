@@ -1,3 +1,2 @@
 [alias]
 release = "publish --registry crates-io"
-
