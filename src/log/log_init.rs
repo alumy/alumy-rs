@@ -14,14 +14,16 @@ type SharedSender = Arc<Mutex<Option<crossbeam::channel::Sender<Vec<u8>>>>>;
 static LOG_GUARD: std::sync::OnceLock<Arc<NonBlockingGuard>> = std::sync::OnceLock::new();
 
 /// Configuration for the logger.
-/// 
-/// Supports fluent API for easy setup.
-/// 
+///
+/// Supports a fluent builder API for easy setup.  Call [`LogConfig::new`] to
+/// create an instance, chain the desired `with_*` methods, and then call
+/// [`LogConfig::init`] to activate the global subscriber.
+///
 /// # Examples
-/// 
+///
 /// ```no_run
 /// use alumy::LogConfig;
-/// 
+///
 /// LogConfig::new("my-app", "info")
 ///     .with_file("logs/app.log", "10M", 5)
 ///     .with_target(true)
@@ -30,23 +32,41 @@ static LOG_GUARD: std::sync::OnceLock<Arc<NonBlockingGuard>> = std::sync::OnceLo
 /// ```
 #[derive(Debug, Clone, Default)]
 pub struct LogConfig {
+    /// Application name used to identify this logger instance.
     pub name: Option<String>,
+    /// Path to the log file.  When `None`, output goes to stdout.
     pub file: Option<String>,
+    /// Minimum log level (e.g. `"info"`, `"debug"`, `"warn"`).
     pub level: Option<String>,
+    /// Maximum size of a single log file before rotation (e.g. `"10M"`).
+    /// Required when [`file`](Self::file) is set.
     pub max_size: Option<String>,
+    /// Maximum number of rotated log files to retain.
+    /// Required when [`file`](Self::file) is set.
     pub max_files: Option<u32>,
+    /// Custom [`EnvFilter`](tracing_subscriber::EnvFilter) directive string
+    /// (e.g. `"info,my_crate=debug"`).  Overrides [`level`](Self::level) when set.
     pub filter: Option<String>,
+    /// Whether to emit ANSI colour codes.  Defaults to `true` for stdout,
+    /// `false` for file output.
     pub ansi: Option<bool>,
+    /// Whether to include the tracing target (module path) in each log line.
     pub display_target: Option<bool>,
+    /// Whether to include the log level in each log line.  Defaults to `true`.
     pub display_level: Option<bool>,
+    /// Whether to include a timestamp in each log line.  Defaults to `true`.
     pub display_time: Option<bool>,
+    /// Whether to include the thread name in each log line.
     pub display_thread_name: Option<bool>,
+    /// Whether to include the thread ID in each log line.
     pub display_thread_id: Option<bool>,
+    /// Timestamp format.  Use `"uptime"` for elapsed seconds since boot, or
+    /// `"iso"` (default) for a local-time ISO 8601 string.
     pub time_format: Option<String>,
 }
 
 impl LogConfig {
-    /// Creates a new basic log configuration.
+    /// Creates a new log configuration with the required `name` and `level`.
     pub fn new(name: impl Into<String>, level: impl Into<String>) -> Self {
         Self {
             name: Some(name.into()),
@@ -63,60 +83,71 @@ impl LogConfig {
         self
     }
 
-    /// Sets a custom tracing filter (e.g., "info,my_crate=debug").
+    /// Sets a custom tracing filter directive (e.g. `"info,my_crate=debug"`).
+    ///
+    /// When set, this overrides the [`level`](Self::level) field.
     pub fn with_filter(mut self, filter: impl Into<String>) -> Self {
         self.filter = Some(filter.into());
         self
     }
 
-    /// Enables or disables ANSI colors.
+    /// Enables or disables ANSI colour codes in log output.
     pub fn with_ansi(mut self, enable: bool) -> Self {
         self.ansi = Some(enable);
         self
     }
 
-    /// Enables or disables displaying the target (module path).
+    /// Enables or disables the tracing target (module path) in log lines.
     pub fn with_target(mut self, enable: bool) -> Self {
         self.display_target = Some(enable);
         self
     }
 
-    /// Enables or disables displaying the log level.
+    /// Enables or disables the log level label in log lines.
     pub fn with_level_display(mut self, enable: bool) -> Self {
         self.display_level = Some(enable);
         self
     }
 
-    /// Enables or disables displaying the timestamp.
+    /// Enables or disables the timestamp in log lines.
     pub fn with_time(mut self, enable: bool) -> Self {
         self.display_time = Some(enable);
         self
     }
 
-    /// Sets the time format. Use "uptime" for system uptime or "iso" (default) for local time.
+    /// Sets the timestamp format.
+    ///
+    /// Use `"uptime"` for elapsed seconds since boot, or `"iso"` (default)
+    /// for a local-time ISO 8601 string.
     pub fn with_time_format(mut self, format: impl Into<String>) -> Self {
         self.time_format = Some(format.into());
         self
     }
 
-    /// Enables or disables displaying thread names.
+    /// Enables or disables thread names in log lines.
     pub fn with_thread_name(mut self, enable: bool) -> Self {
         self.display_thread_name = Some(enable);
         self
     }
 
-    /// Enables or disables displaying thread IDs.
+    /// Enables or disables thread IDs in log lines.
     pub fn with_thread_id(mut self, enable: bool) -> Self {
         self.display_thread_id = Some(enable);
         self
     }
 
-    /// Initializes the global logger with this configuration.
+    /// Initialises the global logger with this configuration.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if required fields (`name`, `level`) are missing, if
+    /// `file` is set but `max_size` or `max_files` are not, or if the log
+    /// directory cannot be created or the rolling appender cannot be opened.
     pub fn init(&self) -> Result<()> {
         logger_init(self)
     }
 
-    // Helper methods for internal use
+    // Helper accessors with defaults for internal use.
     fn display_target(&self) -> bool { self.display_target.unwrap_or(false) }
     fn display_level(&self) -> bool { self.display_level.unwrap_or(true) }
     fn display_time(&self) -> bool { self.display_time.unwrap_or(true) }
@@ -279,8 +310,8 @@ macro_rules! subscriber_init {
     };
 }
 
-/// Initializes the global logger.
-/// 
+/// Initialises the global logger.
+///
 /// This is an internal function used by [`LogConfig::init`].
 pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
     log_config_check(log_config).inspect_err(|e| eprintln!("Failed to check log config: {e}"))?;
@@ -295,11 +326,11 @@ pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
 
     if let Some(file) = log_config.file.as_deref() {
         let file_path = Path::new(file);
-        
+
         let dir = file_path.parent()
             .filter(|p| !p.as_os_str().is_empty())
             .unwrap_or_else(|| Path::new("."));
-        
+
         let basename = file_path.file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or_else(|| log_config.name.as_deref().unwrap_or("alumy"));
@@ -350,7 +381,7 @@ mod tests {
             .with_file("test.log", "10M", 5)
             .with_ansi(true)
             .with_target(true);
-        
+
         assert_eq!(config.name.as_deref(), Some("test"));
         assert_eq!(config.level.as_deref(), Some("info"));
         assert_eq!(config.file.as_deref(), Some("test.log"));

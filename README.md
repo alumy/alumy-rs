@@ -19,7 +19,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-alumy = "0.1.10"
+alumy = "0.1.13"
 anyhow = "1"
 ```
 

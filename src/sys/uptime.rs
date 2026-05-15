@@ -1,15 +1,40 @@
-/// Returns the system uptime in seconds.
-/// 
-/// On Unix-like systems (Linux, macOS, etc.), it derives from `uptime_duration`.
-/// On Windows, it uses `GetTickCount64`.
+//! System uptime queries.
+
+/// Returns the system uptime in whole seconds.
+///
+/// This is a convenience wrapper around [`uptime_duration`] that discards
+/// sub-second precision.
+///
+/// # Platform notes
+///
+/// - **Unix** (Linux, macOS, …): reads `CLOCK_MONOTONIC` via `clock_gettime(2)`.
+/// - **Windows**: uses `GetTickCount64`.
+/// - **Other**: always returns `0`.
+///
+/// # Examples
+///
+/// ```
+/// let secs = alumy::sys::uptime::uptime();
+/// assert!(secs > 0, "system has been up for at least one second");
+/// ```
 pub fn uptime() -> u64 {
     uptime_duration().as_secs()
 }
 
-/// Returns the system uptime as a `Duration`.
-/// 
-/// On Unix-like systems (Linux, macOS, etc.), it uses `libc::clock_gettime` with `CLOCK_MONOTONIC`.
-/// On Windows, it uses `GetTickCount64`.
+/// Returns the system uptime as a [`std::time::Duration`].
+///
+/// # Platform notes
+///
+/// - **Unix** (Linux, macOS, …): reads `CLOCK_MONOTONIC` via `clock_gettime(2)`.
+/// - **Windows**: uses `GetTickCount64`.
+/// - **Other**: always returns [`Duration::ZERO`](std::time::Duration::ZERO).
+///
+/// # Examples
+///
+/// ```
+/// let d = alumy::sys::uptime::uptime_duration();
+/// assert!(d.as_millis() > 0);
+/// ```
 pub fn uptime_duration() -> std::time::Duration {
     #[cfg(unix)]
     {

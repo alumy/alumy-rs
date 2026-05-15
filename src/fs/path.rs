@@ -1,4 +1,19 @@
-/// Macro to build a path in the format: `dir/name/name.suffix`
+//! Compile-time path construction utilities.
+
+/// Constructs a conventional `dir/name/name.suffix` path at compile time.
+///
+/// All three arguments must be string literals.  The macro expands to a
+/// `&'static str` via [`concat!`], so there is no runtime cost.
+///
+/// # Examples
+///
+/// ```
+/// use alumy::build_path;
+///
+/// assert_eq!(build_path!("/etc",     "alumy", ".conf"), "/etc/alumy/alumy.conf");
+/// assert_eq!(build_path!("/var/log", "alumy", ".log"),  "/var/log/alumy/alumy.log");
+/// assert_eq!(build_path!("/tmp",     "test",  ".txt"),  "/tmp/test/test.txt");
+/// ```
 #[macro_export]
 macro_rules! build_path {
     ($dir:expr, $name:expr, $suffix:expr) => {

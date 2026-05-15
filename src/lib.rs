@@ -1,6 +1,8 @@
+#![warn(missing_docs)]
 //! # alumy
 //!
-//! A batteries-included Rust SDK for rapid application development. Logging, system utilities, and filesystem helpers — all ready to use.
+//! A batteries-included Rust SDK for rapid application development.
+//! Logging, system utilities, and filesystem helpers — all ready to use.
 //!
 //! ## Modules
 //!
@@ -11,8 +13,9 @@
 //!
 //! ## Re-exports
 //!
-//! This crate re-exports logging macros from `tracing` for convenience:
-//! `trace!`, `debug!`, `info!`, `warn!`, `error!`, and the `Level` enum.
+//! [`LogConfig`] is re-exported at the crate root for convenience.
+//! The following items from [`tracing`] are also re-exported:
+//! [`trace!`], [`debug!`], [`info!`], [`warn!`], [`error!`], and [`Level`].
 
 pub mod version;
 pub mod fs;
@@ -22,4 +25,5 @@ pub mod log;
 #[doc(inline)]
 pub use log::LogConfig;
 
+#[doc(no_inline)]
 pub use tracing::{trace, debug, info, warn, error, Level};

@@ -1,6 +1,6 @@
 [package]
 name = "alumy"
-version = "0.1.12"
+version = "0.1.13"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
 description = "A batteries-included Rust SDK for rapid application development. Logging, system utilities, and filesystem helpers — all ready to use."
@@ -26,3 +26,7 @@ tracing-subscriber = { version = "0.3.22", features = ["env-filter", "fmt", "loc
 
 [features]
 default = []
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

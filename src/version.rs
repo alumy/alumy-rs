@@ -1,4 +1,18 @@
-/// Macro to get the current version of the crate at compile time.
+//! Crate metadata and version information.
+//!
+//! Provides compile-time macros and runtime functions for accessing
+//! the crate name and version string embedded by Cargo.
+
+/// Returns the version string of the calling crate, resolved at compile time.
+///
+/// Expands to the value of the `CARGO_PKG_VERSION` environment variable.
+///
+/// # Examples
+///
+/// ```
+/// let v = alumy::crate_version!();
+/// assert!(!v.is_empty());
+/// ```
 #[macro_export]
 macro_rules! crate_version {
     () => {
@@ -6,7 +20,16 @@ macro_rules! crate_version {
     };
 }
 
-/// Macro to get the name of the crate at compile time.
+/// Returns the name of the calling crate, resolved at compile time.
+///
+/// Expands to the value of the `CARGO_PKG_NAME` environment variable.
+///
+/// # Examples
+///
+/// ```
+/// let name = alumy::crate_name!();
+/// assert!(!name.is_empty());
+/// ```
 #[macro_export]
 macro_rules! crate_name {
     () => {
@@ -14,17 +37,35 @@ macro_rules! crate_name {
     };
 }
 
-/// Returns the current version of the crate.
+/// Returns the version string of the `alumy` crate at runtime.
+///
+/// This is a thin wrapper around [`crate_version!`].
+///
+/// # Examples
+///
+/// ```
+/// let v = alumy::version::version();
+/// assert_eq!(v, env!("CARGO_PKG_VERSION"));
+/// ```
 pub fn version() -> &'static str {
     crate_version!()
 }
 
-/// Returns the name of the crate.
+/// Returns the name of the `alumy` crate at runtime.
+///
+/// This is a thin wrapper around [`crate_name!`].
+///
+/// # Examples
+///
+/// ```
+/// let n = alumy::version::name();
+/// assert_eq!(n, "alumy");
+/// ```
 pub fn name() -> &'static str {
     crate_name!()
 }
 
-/// Returns a greeting message including the crate name and version.
+/// Returns a greeting string that includes the crate name and version.
 ///
 /// # Examples
 ///
