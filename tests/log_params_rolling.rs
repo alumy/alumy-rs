@@ -1,8 +1,8 @@
 mod common;
 use alumy::log::LogConfig;
 use std::fs;
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 #[test]
 fn test_log_params_rolling() {
@@ -11,8 +11,7 @@ fn test_log_params_rolling() {
     let _guard = common::CleanupGuard(log_dir);
     common::setup_log_dir(log_dir);
 
-    let config = LogConfig::new("test_rolling", "info")
-        .with_file(log_file, "500", 3);
+    let config = LogConfig::new("test_rolling", "info").with_file(log_file, "500", 3);
 
     config.init().expect("Failed to initialize logger");
 
@@ -24,7 +23,7 @@ fn test_log_params_rolling() {
 
     let entries = fs::read_dir(log_dir).expect("Failed to read log directory");
     let file_count = entries.count();
-    
+
     assert!(file_count > 1, "Should have rolled at least once");
     assert!(file_count <= 4, "Should respect max_files");
 }

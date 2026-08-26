@@ -8,7 +8,7 @@ use std::time::Duration;
 fn test_log_uptime_format() {
     let log_dir = "test_logs_uptime_basic";
     let log_file = "test_logs_uptime_basic/test_uptime.log";
-    
+
     if Path::new(log_dir).exists() {
         let _ = fs::remove_dir_all(log_dir);
     }
@@ -20,14 +20,20 @@ fn test_log_uptime_format() {
     config.init().expect("Failed to initialize logger");
 
     tracing::info!("Testing uptime format");
-    
+
     thread::sleep(Duration::from_millis(200));
 
     let content = fs::read_to_string(log_file).expect("Failed to read log file");
     // Uptime format looks like "[   0.123]"
-    assert!(content.contains("["), "Uptime format missing opening bracket");
+    assert!(
+        content.contains("["),
+        "Uptime format missing opening bracket"
+    );
     assert!(content.contains("."), "Uptime format missing dot");
-    assert!(content.contains("Testing uptime format"), "Log message missing");
+    assert!(
+        content.contains("Testing uptime format"),
+        "Log message missing"
+    );
 
     if Path::new(log_dir).exists() {
         let _ = fs::remove_dir_all(log_dir);

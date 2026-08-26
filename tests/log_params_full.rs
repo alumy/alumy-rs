@@ -30,11 +30,11 @@ fn test_log_params_full() {
         })
         .unwrap();
     handle.join().unwrap();
-    
+
     thread::sleep(Duration::from_millis(200));
 
     let content = fs::read_to_string(log_file).expect("Failed to read log file");
-    
+
     assert!(content.contains("\u{1b}"), "ANSI colors missing");
     assert!(content.contains("INFO"), "Level missing");
     assert!(content.contains("log_params_full"), "Target missing");

@@ -14,7 +14,7 @@
 /// # Examples
 ///
 /// ```
-/// let secs = alumy::sys::uptime::uptime();
+/// let secs = alumy_linux::sys::uptime::uptime();
 /// assert!(secs > 0, "system has been up for at least one second");
 /// ```
 pub fn uptime() -> u64 {
@@ -32,7 +32,7 @@ pub fn uptime() -> u64 {
 /// # Examples
 ///
 /// ```
-/// let d = alumy::sys::uptime::uptime_duration();
+/// let d = alumy_linux::sys::uptime::uptime_duration();
 /// assert!(d.as_millis() > 0);
 /// ```
 pub fn uptime_duration() -> std::time::Duration {

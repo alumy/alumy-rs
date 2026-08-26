@@ -1,8 +1,8 @@
 mod common;
 use alumy::log::LogConfig;
 use std::fs;
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 #[test]
 fn test_log_params_filter() {
@@ -25,9 +25,18 @@ fn test_log_params_filter() {
     thread::sleep(Duration::from_millis(200));
 
     let content = fs::read_to_string(log_file).expect("Failed to read log file");
-    
+
     assert!(content.contains("DEBUG"), "Debug level missing");
-    assert!(content.contains("Debug message should appear"), "Debug message missing");
-    assert!(content.contains("Info message should appear"), "Info message missing");
-    assert!(!content.contains("Debug message should NOT appear"), "Filtered debug message present");
+    assert!(
+        content.contains("Debug message should appear"),
+        "Debug message missing"
+    );
+    assert!(
+        content.contains("Info message should appear"),
+        "Info message missing"
+    );
+    assert!(
+        !content.contains("Debug message should NOT appear"),
+        "Filtered debug message present"
+    );
 }

@@ -1,0 +1,25 @@
+[package]
+name = "alumy-bare"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Bare-metal MCU layer for the alumy cross-platform SDK."
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme.workspace = true
+keywords = ["cross-platform", "sdk", "embedded", "bare-metal", "no-std"]
+categories = ["embedded", "no-std"]
+rust-version.workspace = true
+
+[dependencies]
+alumy-core = { workspace = true, default-features = false }
+
+[features]
+default = []
+alloc = ["alumy-core/alloc"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

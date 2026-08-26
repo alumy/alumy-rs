@@ -6,7 +6,7 @@
 //! # Quick start
 //!
 //! ```no_run
-//! use alumy::LogConfig;
+//! use alumy_linux::LogConfig;
 //!
 //! LogConfig::new("my-app", "info")
 //!     .with_file("logs/app.log", "10M", 5)

@@ -22,7 +22,7 @@ static LOG_GUARD: std::sync::OnceLock<Arc<NonBlockingGuard>> = std::sync::OnceLo
 /// # Examples
 ///
 /// ```no_run
-/// use alumy::LogConfig;
+/// use alumy_linux::LogConfig;
 ///
 /// LogConfig::new("my-app", "info")
 ///     .with_file("logs/app.log", "10M", 5)
@@ -76,7 +76,12 @@ impl LogConfig {
     }
 
     /// Sets the log file path and rolling policy.
-    pub fn with_file(mut self, path: impl Into<String>, max_size: impl Into<String>, max_files: u32) -> Self {
+    pub fn with_file(
+        mut self,
+        path: impl Into<String>,
+        max_size: impl Into<String>,
+        max_files: u32,
+    ) -> Self {
         self.file = Some(path.into());
         self.max_size = Some(max_size.into());
         self.max_files = Some(max_files);
@@ -148,12 +153,24 @@ impl LogConfig {
     }
 
     // Helper accessors with defaults for internal use.
-    fn display_target(&self) -> bool { self.display_target.unwrap_or(false) }
-    fn display_level(&self) -> bool { self.display_level.unwrap_or(true) }
-    fn display_time(&self) -> bool { self.display_time.unwrap_or(true) }
-    fn display_thread_name(&self) -> bool { self.display_thread_name.unwrap_or(false) }
-    fn display_thread_id(&self) -> bool { self.display_thread_id.unwrap_or(false) }
-    fn time_format(&self) -> &str { self.time_format.as_deref().unwrap_or("iso") }
+    fn display_target(&self) -> bool {
+        self.display_target.unwrap_or(false)
+    }
+    fn display_level(&self) -> bool {
+        self.display_level.unwrap_or(true)
+    }
+    fn display_time(&self) -> bool {
+        self.display_time.unwrap_or(true)
+    }
+    fn display_thread_name(&self) -> bool {
+        self.display_thread_name.unwrap_or(false)
+    }
+    fn display_thread_id(&self) -> bool {
+        self.display_thread_id.unwrap_or(false)
+    }
+    fn time_format(&self) -> &str {
+        self.time_format.as_deref().unwrap_or("iso")
+    }
 }
 
 struct UptimeTime;
@@ -161,7 +178,12 @@ struct UptimeTime;
 impl tracing_subscriber::fmt::time::FormatTime for UptimeTime {
     fn format_time(&self, w: &mut tracing_subscriber::fmt::format::Writer<'_>) -> std::fmt::Result {
         let duration = crate::sys::uptime::uptime_duration();
-        write!(w, "[{:>6}.{:03}]", duration.as_secs(), duration.subsec_millis())
+        write!(
+            w,
+            "[{:>6}.{:03}]",
+            duration.as_secs(),
+            duration.subsec_millis()
+        )
     }
 }
 
@@ -190,7 +212,12 @@ impl NonBlockingWriter {
             handle: Some(handle),
         };
 
-        (NonBlockingWriter { sender: shared_sender }, guard)
+        (
+            NonBlockingWriter {
+                sender: shared_sender,
+            },
+            guard,
+        )
     }
 }
 
@@ -302,9 +329,11 @@ macro_rules! subscriber_init {
             let _ = registry.with($layer.with_timer(UptimeTime)).try_init();
         } else {
             let _ = registry
-                .with($layer.with_timer(fmt::time::LocalTime::new(time::macros::format_description!(
-                    "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond digits:3]"
-                ))))
+                .with($layer.with_timer(fmt::time::LocalTime::new(
+                    time::macros::format_description!(
+                        "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond digits:3]"
+                    ),
+                )))
                 .try_init();
         }
     };
@@ -327,16 +356,20 @@ pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
     if let Some(file) = log_config.file.as_deref() {
         let file_path = Path::new(file);
 
-        let dir = file_path.parent()
+        let dir = file_path
+            .parent()
             .filter(|p| !p.as_os_str().is_empty())
             .unwrap_or_else(|| Path::new("."));
 
-        let basename = file_path.file_stem()
+        let basename = file_path
+            .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or_else(|| log_config.name.as_deref().unwrap_or("alumy"));
 
-        let max_size = log_config.max_size.as_deref()
-            .and_then(crate::fs::filesize::parse_size)
+        let max_size = log_config
+            .max_size
+            .as_deref()
+            .and_then(alumy_core::fs::filesize::parse_size)
             .unwrap_or(1024 * 1024);
 
         let rolling_appender = BasicRollingFileAppender::new(

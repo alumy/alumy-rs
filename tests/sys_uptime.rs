@@ -19,7 +19,7 @@ fn test_uptime_consistency() {
 fn test_uptime_duration() {
     let duration = uptime_duration();
     assert!(duration.as_secs() > 0);
-    
+
     let up = uptime();
 
     let diff = if duration.as_secs() > up {
@@ -28,5 +28,10 @@ fn test_uptime_duration() {
         up - duration.as_secs()
     };
 
-    assert!(diff <= 1, "uptime_duration ({}s) and uptime ({}s) differ by more than 1s", duration.as_secs(), up);
+    assert!(
+        diff <= 1,
+        "uptime_duration ({}s) and uptime ({}s) differ by more than 1s",
+        duration.as_secs(),
+        up
+    );
 }

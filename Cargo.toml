@@ -1,19 +1,31 @@
-[package]
-name = "alumy"
+[workspace]
+members = [
+    ".",
+    "crates/core",
+    "crates/linux",
+    "crates/bare",
+    "crates/freertos",
+    "crates/embassy",
+]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.13"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
-description = "A batteries-included Rust SDK for rapid application development. Logging, system utilities, and filesystem helpers — all ready to use."
 license = "MIT"
 repository = "https://github.com/alumy/alumy-rs"
 homepage = "https://github.com/alumy/alumy-rs"
 documentation = "https://docs.rs/alumy"
 readme = "README.md"
-keywords = ["cross-platform", "sdk", "utilities", "logging", "filesystem"]
-categories = ["development-tools", "os"]
 rust-version = "1.70"
 
-[dependencies]
+[workspace.dependencies]
+alumy-core = { path = "crates/core", version = "0.1.13", default-features = false }
+alumy-linux = { path = "crates/linux", version = "0.1.13" }
+alumy-bare = { path = "crates/bare", version = "0.1.13", default-features = false }
+alumy-freertos = { path = "crates/freertos", version = "0.1.13", default-features = false }
+alumy-embassy = { path = "crates/embassy", version = "0.1.13", default-features = false }
 anyhow = "1.0.100"
 crossbeam = "0.8.4"
 libc = "0.2.180"
@@ -22,10 +34,37 @@ time = { version = "0.3.41", features = ["macros", "local-offset", "formatting"]
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter", "fmt", "local-time"] }
 
+[package]
+name = "alumy"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "A cross-platform Rust SDK for Linux and MCU development."
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme.workspace = true
+keywords = ["cross-platform", "sdk", "utilities", "logging", "embedded"]
+categories = ["development-tools", "embedded", "os"]
+rust-version.workspace = true
+
+[dependencies]
+alumy-core = { workspace = true, features = ["alloc"] }
+alumy-bare = { workspace = true, optional = true }
+alumy-embassy = { workspace = true, optional = true }
+alumy-freertos = { workspace = true, optional = true }
+alumy-linux = { workspace = true, optional = true }
+
 [dev-dependencies]
+tracing.workspace = true
 
 [features]
-default = []
+default = ["linux"]
+linux = ["dep:alumy-linux"]
+bare = ["dep:alumy-bare"]
+freertos = ["dep:alumy-freertos"]
+embassy = ["dep:alumy-embassy"]
 
 [package.metadata.docs.rs]
 all-features = true

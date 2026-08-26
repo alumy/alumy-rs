@@ -4,18 +4,45 @@
 [![Documentation](https://docs.rs/alumy/badge.svg)](https://docs.rs/alumy)
 [![License](https://img.shields.io/crates/l/alumy.svg)](https://github.com/alumy/alumy-rs/blob/main/LICENSE)
 
-A batteries-included Rust SDK for rapid application development. Logging, system utilities, and filesystem helpers — all ready to use.
+A compact cross-platform Rust SDK for Linux and MCU development.
+
+## Workspace
+
+```text
+alumy/
+├── Cargo.toml
+├── crates/
+│   ├── core
+│   ├── linux
+│   ├── bare
+│   ├── freertos
+│   └── embassy
+├── examples/
+│   ├── linux
+│   ├── bare
+│   ├── freertos
+│   └── embassy
+└── tests
+```
+
+## Platforms
+
+- `core`: no_std-friendly shared helpers.
+- `linux`: default Linux/desktop layer with logging, filesystem helpers, and uptime.
+- `bare`: bare-metal MCU layer, no_std by default.
+- `freertos`: FreeRTOS MCU layer, no_std by default.
+- `embassy`: Embassy MCU layer, no_std by default.
 
 ## Features
 
-- **High-Performance Logging**: Non-blocking logger based on `tracing` with fluent configuration API, log rotation, and system uptime timestamps. Works across platforms.
-- **System Utilities**: Helpers for system information such as uptime (supports Linux, macOS, and Windows).
-- **Filesystem Utilities**: Size parsing/formatting and path building helpers.
-- **Version Management**: Macros and functions to access crate metadata at compile time.
+- `linux`: enabled by default.
+- `bare`: enables the bare-metal MCU layer.
+- `freertos`: enables the FreeRTOS MCU layer.
+- `embassy`: enables the Embassy MCU layer.
 
 ## Installation
 
-Add this to your `Cargo.toml`:
+Linux/default:
 
 ```toml
 [dependencies]
@@ -23,20 +50,37 @@ alumy = "0.1.13"
 anyhow = "1"
 ```
 
+Bare-metal MCU:
+
+```toml
+[dependencies]
+alumy = { version = "0.1.13", default-features = false, features = ["bare"] }
+```
+
+FreeRTOS MCU:
+
+```toml
+[dependencies]
+alumy = { version = "0.1.13", default-features = false, features = ["freertos"] }
+```
+
+Embassy MCU:
+
+```toml
+[dependencies]
+alumy = { version = "0.1.13", default-features = false, features = ["embassy"] }
+```
+
 ## Usage
 
-### Logging Setup
-
-Alumy provides a modern, non-blocking logger based on `tracing`. It re-exports all logging macros (`trace!`, `debug!`, `info!`, `warn!`, `error!`) for convenience:
+### Linux Logging
 
 ```rust
-use alumy::{LogConfig, info, debug};
+use alumy::{debug, info, LogConfig};
 
 fn main() -> anyhow::Result<()> {
-    // Basic setup
     LogConfig::new("my-app", "info").init()?;
 
-    // Advanced setup with log rotation and system uptime
     LogConfig::new("my-app", "debug")
         .with_file("logs/app.log", "10M", 5)
         .with_time_format("uptime")
@@ -52,8 +96,6 @@ fn main() -> anyhow::Result<()> {
 
 ### System Uptime
 
-Access system uptime information:
-
 ```rust
 use alumy::sys::uptime;
 
@@ -63,31 +105,15 @@ fn main() {
 }
 ```
 
-### Filesystem Utilities
-
-Parse and format file sizes easily:
+### Core Helpers
 
 ```rust
 use alumy::fs::filesize;
-
-fn main() {
-    let size = filesize::parse_size("10M").unwrap();
-    println!("10M in bytes: {}", size);
-    println!("Formatted: {}", filesize::format_size(size)); // "10.0MB"
-}
-```
-
-### Version Information
-
-Access crate metadata:
-
-```rust
-use alumy::version;
 use alumy::{crate_name, crate_version};
 
 fn main() {
-    println!("Running {} v{}", crate_name!(), crate_version!());
-    println!("{}", version::hello());
+    let size = filesize::parse_size("10M").unwrap();
+    println!("{} {}: {} bytes", crate_name!(), crate_version!(), size);
 }
 ```
 
@@ -97,7 +123,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Please feel free to submit a Pull Request.
 
 ## Links
 

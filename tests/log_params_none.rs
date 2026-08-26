@@ -29,15 +29,24 @@ fn test_log_params_none() {
         })
         .unwrap();
     handle.join().unwrap();
-    
+
     thread::sleep(Duration::from_millis(200));
 
     let content = fs::read_to_string(log_file).expect("Failed to read log file");
-    
+
     assert!(!content.contains("\u{1b}"), "ANSI colors should be absent");
     assert!(!content.contains("INFO"), "Level should be absent");
-    assert!(!content.contains("log_params_none"), "Target should be absent");
-    assert!(!content.contains("hidden-thread"), "Thread name should be absent");
+    assert!(
+        !content.contains("log_params_none"),
+        "Target should be absent"
+    );
+    assert!(
+        !content.contains("hidden-thread"),
+        "Thread name should be absent"
+    );
     assert!(!content.contains("ThreadId"), "Thread ID should be absent");
-    assert!(content.contains("Minimal message content"), "Message content missing");
+    assert!(
+        content.contains("Minimal message content"),
+        "Message content missing"
+    );
 }

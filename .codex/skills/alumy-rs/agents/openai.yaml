@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alumy"
+  short_description: "Work on the alumy Rust crate"
+  default_prompt: "Use this skill when maintaining the alumy Rust crate."
