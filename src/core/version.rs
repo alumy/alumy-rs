@@ -23,12 +23,12 @@ macro_rules! crate_name {
     };
 }
 
-/// Returns the version string of the `alumy-core` crate at runtime.
+/// Returns the version string of the `alumy` crate at runtime.
 pub fn version() -> &'static str {
     crate_version!()
 }
 
-/// Returns the name of the `alumy-core` crate at runtime.
+/// Returns the name of the `alumy` crate at runtime.
 pub fn name() -> &'static str {
     crate_name!()
 }
@@ -51,14 +51,14 @@ mod tests {
 
     #[test]
     fn test_name() {
-        assert_eq!(name(), "alumy-core");
-        assert_eq!(crate_name!(), "alumy-core");
+        assert_eq!(name(), "alumy");
+        assert_eq!(crate_name!(), "alumy");
     }
 
     #[test]
     fn test_hello() {
         let greeting = hello();
-        assert!(greeting.contains("alumy-core"));
+        assert!(greeting.contains("alumy"));
         assert!(greeting.contains(env!("CARGO_PKG_VERSION")));
     }
 }

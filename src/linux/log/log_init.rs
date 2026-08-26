@@ -22,7 +22,7 @@ static LOG_GUARD: std::sync::OnceLock<Arc<NonBlockingGuard>> = std::sync::OnceLo
 /// # Examples
 ///
 /// ```no_run
-/// use alumy_linux::LogConfig;
+/// use alumy::LogConfig;
 ///
 /// LogConfig::new("my-app", "info")
 ///     .with_file("logs/app.log", "10M", 5)
@@ -370,7 +370,7 @@ pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
         let max_size = log_config
             .max_size
             .as_deref()
-            .and_then(alumy_core::fs::filesize::parse_size)
+            .and_then(crate::fs::filesize::parse_size)
             .unwrap_or(1024 * 1024);
 
         let rolling_appender = BasicRollingFileAppender::new(

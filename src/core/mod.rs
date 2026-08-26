@@ -1,12 +1,7 @@
-#![no_std]
-#![warn(missing_docs)]
 //! Core no_std-friendly building blocks for Alumy.
 //!
-//! This crate contains utilities that can be shared by Linux, desktop, and MCU
+//! This module contains utilities that can be shared by Linux, desktop, and MCU
 //! targets without pulling in operating-system integrations.
-
-#[cfg(feature = "alloc")]
-extern crate alloc;
 
 pub mod version;
 

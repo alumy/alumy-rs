@@ -11,12 +11,9 @@ A compact cross-platform Rust SDK for Linux and MCU development.
 ```text
 alumy/
 ├── Cargo.toml
-├── crates/
+├── src/
 │   ├── core
-│   ├── linux
-│   ├── bare
-│   ├── freertos
-│   └── embassy
+│   └── linux
 ├── examples/
 │   ├── linux
 │   ├── bare
@@ -27,11 +24,14 @@ alumy/
 
 ## Platforms
 
-- `core`: no_std-friendly shared helpers.
+- `fs` and `version`: no_std-friendly shared helpers.
 - `linux`: default Linux/desktop layer with logging, filesystem helpers, and uptime.
 - `bare`: bare-metal MCU layer, no_std by default.
 - `freertos`: FreeRTOS MCU layer, no_std by default.
 - `embassy`: Embassy MCU layer, no_std by default.
+
+Only the root `alumy` crate is published. Applications select one platform
+layer with Cargo features instead of depending on platform-specific crates.
 
 ## Features
 
