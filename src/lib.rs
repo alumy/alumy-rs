@@ -17,37 +17,13 @@ pub use crate::core::fs;
 pub use crate::core::version;
 
 #[cfg(feature = "bare")]
-pub mod bare {
-    //! Bare-metal MCU layer for Alumy.
-    //!
-    //! This module is for firmware without an RTOS. It stays no_std-compatible
-    //! and re-exports the shared core helpers.
-
-    #[doc(no_inline)]
-    pub use crate::{build_path, crate_name, crate_version, fs, version};
-}
+pub mod bare;
 
 #[cfg(feature = "embassy")]
-pub mod embassy {
-    //! Embassy MCU layer for Alumy.
-    //!
-    //! This module is the home for Embassy-specific async adapters. It stays
-    //! no_std-compatible and re-exports the shared core helpers.
-
-    #[doc(no_inline)]
-    pub use crate::{build_path, crate_name, crate_version, fs, version};
-}
+pub mod embassy;
 
 #[cfg(feature = "freertos")]
-pub mod freertos {
-    //! FreeRTOS MCU layer for Alumy.
-    //!
-    //! This module is the home for FreeRTOS-specific adapters. It stays
-    //! no_std-compatible and re-exports the shared core helpers.
-
-    #[doc(no_inline)]
-    pub use crate::{build_path, crate_name, crate_version, fs, version};
-}
+pub mod freertos;
 
 #[cfg(feature = "linux")]
 pub mod linux;
