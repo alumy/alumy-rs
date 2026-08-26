@@ -54,6 +54,7 @@ exclude = [
     ".codex/**",
     "AGENTS.md",
     "CLAUDE.md",
+    "SKILL.md",
 ]
 
 [dependencies]
