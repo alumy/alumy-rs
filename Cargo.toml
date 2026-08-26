@@ -15,7 +15,7 @@ panic = "abort"
 panic = "abort"
 
 [workspace.package]
-version = "0.1.14"
+version = "0.1.15"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
 license = "MIT"
@@ -52,6 +52,8 @@ exclude = [
     ".cargo/**",
     ".claude/**",
     ".codex/**",
+    "release_check.sh",
+    "SKILL.md",
 ]
 
 [dependencies]

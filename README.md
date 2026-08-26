@@ -4,116 +4,45 @@
 [![Documentation](https://docs.rs/alumy/badge.svg)](https://docs.rs/alumy)
 [![License](https://img.shields.io/crates/l/alumy.svg)](https://github.com/alumy/alumy-rs/blob/main/LICENSE)
 
-A compact cross-platform Rust SDK for Linux and MCU development.
-
-## Workspace
-
-```text
-alumy/
-├── Cargo.toml
-├── src/
-│   ├── core
-│   ├── linux
-│   ├── bare
-│   ├── freertos
-│   └── embassy
-├── examples/
-│   ├── linux
-│   ├── bare
-│   ├── freertos
-│   └── embassy
-└── tests/
-    ├── linux/
-    ├── bare/
-    ├── freertos/
-    └── embassy/
-```
+`alumy` is a small cross-platform Rust library for Linux and MCU firmware.
+The project publishes one crate and selects platform integrations with Cargo
+features.
 
 ## Platforms
 
-- `fs` and `version`: no_std-friendly shared helpers.
-- `linux`: default Linux/desktop layer with logging, filesystem helpers, and uptime.
-- `bare`: bare-metal MCU layer, no_std by default.
-- `freertos`: FreeRTOS MCU layer, no_std by default.
-- `embassy`: Embassy MCU layer, no_std by default.
+| Feature | Target | Role |
+| --- | --- | --- |
+| `linux` | Linux and desktop | Logging, filesystem helpers, and uptime |
+| `bare` | Bare-metal MCU | no_std platform extension point |
+| `freertos` | MCU with FreeRTOS | no_std RTOS extension point |
+| `embassy` | MCU with Embassy | no_std async extension point |
 
-Only the root `alumy` crate is published. Applications select one platform
-layer with Cargo features instead of depending on platform-specific crates.
+`linux` is enabled by default. MCU applications should disable default
+features and select one MCU feature.
 
-## Features
+## Install
 
-- `linux`: enabled by default.
-- `bare`: enables the bare-metal MCU layer.
-- `freertos`: enables the FreeRTOS MCU layer.
-- `embassy`: enables the Embassy MCU layer.
-
-## Installation
-
-Linux/default:
+Linux or desktop:
 
 ```toml
 [dependencies]
-alumy = "0.1.14"
+alumy = "0.1.15"
 anyhow = "1"
 ```
 
-Bare-metal MCU:
+MCU application:
 
 ```toml
 [dependencies]
-alumy = { version = "0.1.14", default-features = false, features = ["bare"] }
+alumy = { version = "0.1.15", default-features = false, features = ["bare"] }
 ```
 
-FreeRTOS MCU:
+Replace `bare` with `freertos` or `embassy` as needed. Only the root `alumy`
+crate is published; platform layers are not separate crates.
 
-```toml
-[dependencies]
-alumy = { version = "0.1.14", default-features = false, features = ["freertos"] }
-```
+## API
 
-Embassy MCU:
-
-```toml
-[dependencies]
-alumy = { version = "0.1.14", default-features = false, features = ["embassy"] }
-```
-
-## Usage
-
-### Linux Logging
-
-```rust
-use alumy::{debug, info, LogConfig};
-
-fn main() -> anyhow::Result<()> {
-    LogConfig::new("my-app", "debug")
-        .with_file("logs/app.log", "10M", 5)
-        .with_time_format("uptime")
-        .with_ansi(true)
-        .with_target(true)
-        .init()?;
-
-    info!("Hello, alumy logger!");
-    debug!("Debug message");
-    Ok(())
-}
-```
-
-`LogConfig::init` installs a process-wide tracing subscriber and should be
-called once during application startup.
-
-### System Uptime
-
-```rust
-use alumy::sys::uptime;
-
-fn main() {
-    println!("Uptime: {} seconds", uptime::uptime());
-    println!("Uptime duration: {:?}", uptime::uptime_duration());
-}
-```
-
-### Core Helpers
+The shared API is available on every platform:
 
 ```rust
 use alumy::fs::filesize;
@@ -125,32 +54,77 @@ fn main() {
 }
 ```
 
-## Examples
+Linux logging and uptime are enabled with the default feature:
 
-The `examples` workspace members are compiled by the normal workspace checks:
+```rust
+use alumy::{info, LogConfig};
 
-```bash
-cargo run -p alumy-example-linux
-cargo build -p alumy-example-bare --target thumbv7em-none-eabihf
-cargo build -p alumy-example-freertos --target thumbv7em-none-eabihf
-cargo build -p alumy-example-embassy --target thumbv7em-none-eabihf
+fn main() -> anyhow::Result<()> {
+    LogConfig::new("my-app", "info")
+        .with_file("logs/app.log", "10M", 5)
+        .with_time_format("uptime")
+        .init()?;
+
+    info!("Hello, alumy!");
+    Ok(())
+}
 ```
 
-The MCU examples are `no_std` firmware binaries. They provide an ARM entry
-point and linker memory layout; update `memory.x` and the board-specific HAL
-configuration for the target chip, then flash the generated ELF with your
-debug probe tool.
+`LogConfig::init` installs a process-wide tracing subscriber and should be
+called once during application startup.
+
+## Repository Layout
+
+```text
+src/
+├── core/       Shared no_std implementation
+├── linux/      Linux implementation
+├── bare/       Bare-metal namespace
+├── freertos/   FreeRTOS namespace
+└── embassy/    Embassy namespace
+
+examples/
+├── linux/      Host executable
+├── bare/       Cortex-M firmware binary
+├── freertos/   FreeRTOS firmware binary
+└── embassy/    Embassy firmware binary
+
+tests/
+├── core/       Shared integration tests
+├── linux/      Linux-specific tests
+├── bare/       Bare-metal test extension point
+├── freertos/   FreeRTOS test extension point
+├── embassy/    Embassy test extension point
+└── platform.rs Single feature-gated test entry point
+```
+
+## Build And Test
+
+Run the complete release validation from the repository root:
+
+```bash
+./release_check.sh
+```
+
+The script checks all library features, tests, host examples, ARM firmware
+examples, documentation, and the `alumy` crates.io publish dry-run.
+
+The MCU examples use `thumbv7em-none-eabihf` and produce ELF firmware files.
+Update each example's `memory.x` and board-specific HAL configuration before
+flashing with a debug probe.
+
+For a quick local test run:
+
+```bash
+cargo test --workspace --all-features
+```
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## Contributing
-
-Contributions are welcome. Please feel free to submit a Pull Request.
+Licensed under the [MIT License](LICENSE).
 
 ## Links
 
-- [GitHub Repository](https://github.com/alumy/alumy-rs)
+- [Repository](https://github.com/alumy/alumy-rs)
 - [Documentation](https://docs.rs/alumy)
 - [Crates.io](https://crates.io/crates/alumy)
