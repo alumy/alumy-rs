@@ -15,10 +15,12 @@
 - Keep platform examples as workspace members under `examples`; MCU examples
   must remain no_std-compatible firmware binaries and independently
   cross-checkable for their target.
-- Keep integration tests grouped by platform under `tests/linux`, `tests/bare`,
-  `tests/freertos`, and `tests/embassy`. Use the implicit `tests/platform.rs`
-  entry point to enable platform modules by feature; Linux logger tests use
-  child-process isolation for global subscribers.
+- Keep integration tests grouped under `tests/core`, `tests/linux`,
+  `tests/bare`, `tests/freertos`, and `tests/embassy`. Shared API behavior
+  belongs in `tests/core`; platform-specific cases stay in their platform
+  directory. Use the implicit `tests/platform.rs` entry point to enable
+  platform modules by feature; Linux logger tests use child-process isolation
+  for global subscribers.
 
 ## Coding Rules
 

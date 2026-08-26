@@ -1,6 +1,6 @@
-use alumy::bare::fs;
+use alumy::fs;
 
 #[test]
-fn re_exports_fs_filesize() {
+fn parse_filesize() {
     assert_eq!(fs::filesize::parse_size("4KiB"), Some(4096));
 }

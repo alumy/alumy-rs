@@ -1,5 +1,7 @@
 //! Cross-platform integration-test entry point.
 
+mod core;
+
 #[cfg(feature = "bare")]
 #[path = "bare/mod.rs"]
 mod bare;
