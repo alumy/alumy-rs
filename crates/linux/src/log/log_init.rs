@@ -187,7 +187,7 @@ impl tracing_subscriber::fmt::time::FormatTime for UptimeTime {
     }
 }
 
-pub struct NonBlockingWriter {
+struct NonBlockingWriter {
     sender: SharedSender,
 }
 
@@ -229,7 +229,7 @@ impl Clone for NonBlockingWriter {
     }
 }
 
-pub struct NonBlockingWriterHandle {
+struct NonBlockingWriterHandle {
     sender: SharedSender,
     buffer: Vec<u8>,
 }
@@ -269,7 +269,7 @@ impl<'a> MakeWriter<'a> for NonBlockingWriter {
     }
 }
 
-pub struct NonBlockingGuard {
+struct NonBlockingGuard {
     sender: SharedSender,
     handle: Option<JoinHandle<()>>,
 }
@@ -321,22 +321,23 @@ fn log_dir_create(log_config: &LogConfig) -> Result<()> {
 }
 
 macro_rules! subscriber_init {
-    ($env_filter:expr, $layer:expr, $cfg:expr) => {
+    ($env_filter:expr, $layer:expr, $cfg:expr) => {{
         let registry = tracing_subscriber::registry().with($env_filter);
-        if !$cfg.display_time() {
-            let _ = registry.with($layer.without_time()).try_init();
+        let result = if !$cfg.display_time() {
+            registry.with($layer.without_time()).try_init()
         } else if $cfg.time_format() == "uptime" {
-            let _ = registry.with($layer.with_timer(UptimeTime)).try_init();
+            registry.with($layer.with_timer(UptimeTime)).try_init()
         } else {
-            let _ = registry
+            registry
                 .with($layer.with_timer(fmt::time::LocalTime::new(
                     time::macros::format_description!(
                         "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond digits:3]"
                     ),
                 )))
-                .try_init();
-        }
-    };
+                .try_init()
+        };
+        result.map_err(|error| anyhow::anyhow!("Failed to initialize logger: {error}"))
+    }};
 }
 
 /// Initialises the global logger.
@@ -380,7 +381,6 @@ pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
         .map_err(|e| anyhow::anyhow!("Failed to create rolling file appender: {e}"))?;
 
         let (non_blocking, guard) = NonBlockingWriter::new(rolling_appender);
-        LOG_GUARD.get_or_init(|| Arc::new(guard));
 
         let layer = fmt::layer()
             .with_writer(non_blocking)
@@ -390,7 +390,8 @@ pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
             .with_thread_names(log_config.display_thread_name())
             .with_thread_ids(log_config.display_thread_id());
 
-        subscriber_init!(env_filter, layer, log_config);
+        subscriber_init!(env_filter, layer, log_config)?;
+        LOG_GUARD.get_or_init(|| Arc::new(guard));
     } else {
         let layer = fmt::layer()
             .with_ansi(log_config.ansi.unwrap_or(true))
@@ -399,7 +400,7 @@ pub(crate) fn logger_init(log_config: &LogConfig) -> Result<()> {
             .with_thread_names(log_config.display_thread_name())
             .with_thread_ids(log_config.display_thread_id());
 
-        subscriber_init!(env_filter, layer, log_config);
+        subscriber_init!(env_filter, layer, log_config)?;
     }
     Ok(())
 }

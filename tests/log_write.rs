@@ -45,6 +45,12 @@ fn test_log_file_writing() {
         "Log message missing in file"
     );
 
+    let second_init = LogConfig::new("test_write_again", "info").init();
+    assert!(
+        second_init.is_err(),
+        "Second logger initialization succeeded"
+    );
+
     // Clean up after test
     if Path::new(log_dir).exists() {
         let _ = fs::remove_dir_all(log_dir);

@@ -79,8 +79,6 @@ alumy = { version = "0.1.13", default-features = false, features = ["embassy"] }
 use alumy::{debug, info, LogConfig};
 
 fn main() -> anyhow::Result<()> {
-    LogConfig::new("my-app", "info").init()?;
-
     LogConfig::new("my-app", "debug")
         .with_file("logs/app.log", "10M", 5)
         .with_time_format("uptime")
@@ -93,6 +91,9 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 ```
+
+`LogConfig::init` installs a process-wide tracing subscriber and should be
+called once during application startup.
 
 ### System Uptime
 

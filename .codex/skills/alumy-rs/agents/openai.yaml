@@ -1,4 +1,4 @@
 interface:
   display_name: "Alumy"
-  short_description: "Work on the alumy Rust crate"
-  default_prompt: "Use this skill when maintaining the alumy Rust crate."
+  short_description: "Maintain the Alumy Rust workspace"
+  default_prompt: "Maintain Alumy using the repository's shared agent guide."
