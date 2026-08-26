@@ -27,6 +27,12 @@ fn main() {
     // Match this to your target core, e.g. GCC/ARM_CM4F for Cortex-M4F.
     builder.freertos_port("GCC/ARM_CM4F");
 
+    // The vendored FreeRTOS-Kernel port.c has a benign unused-variable
+    // warning under some configs (pxVectorTable in xPortStartScheduler).
+    // It's third-party source we don't own, so silence it at the
+    // compiler-flag level rather than patching the vendored file.
+    builder.get_cc().flag_if_supported("-Wno-unused-variable");
+
     builder
         .compile()
         .unwrap_or_else(|e| panic!("failed to build FreeRTOS kernel: {e}"));
