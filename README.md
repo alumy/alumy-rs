@@ -46,7 +46,7 @@ Linux/default:
 
 ```toml
 [dependencies]
-alumy = "0.1.13"
+alumy = "0.1.14"
 anyhow = "1"
 ```
 
@@ -54,21 +54,21 @@ Bare-metal MCU:
 
 ```toml
 [dependencies]
-alumy = { version = "0.1.13", default-features = false, features = ["bare"] }
+alumy = { version = "0.1.14", default-features = false, features = ["bare"] }
 ```
 
 FreeRTOS MCU:
 
 ```toml
 [dependencies]
-alumy = { version = "0.1.13", default-features = false, features = ["freertos"] }
+alumy = { version = "0.1.14", default-features = false, features = ["freertos"] }
 ```
 
 Embassy MCU:
 
 ```toml
 [dependencies]
-alumy = { version = "0.1.13", default-features = false, features = ["embassy"] }
+alumy = { version = "0.1.14", default-features = false, features = ["embassy"] }
 ```
 
 ## Usage
@@ -117,6 +117,21 @@ fn main() {
     println!("{} {}: {} bytes", crate_name!(), crate_version!(), size);
 }
 ```
+
+## Examples
+
+The `examples` workspace members are compiled by the normal workspace checks:
+
+```bash
+cargo run -p alumy-example-linux
+cargo check -p alumy-example-bare
+cargo check -p alumy-example-freertos
+cargo check -p alumy-example-embassy
+```
+
+The MCU examples are no_std libraries containing portable application logic.
+Board startup, HAL selection, interrupt vectors, and executor or RTOS bindings
+remain in the target firmware crate.
 
 ## License
 

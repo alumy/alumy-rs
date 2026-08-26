@@ -6,11 +6,15 @@ members = [
     "crates/bare",
     "crates/freertos",
     "crates/embassy",
+    "examples/linux",
+    "examples/bare",
+    "examples/freertos",
+    "examples/embassy",
 ]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.13"
+version = "0.1.14"
 edition = "2021"
 authors = ["jack <jackchanrs@gmail.com>"]
 license = "MIT"
@@ -21,11 +25,11 @@ readme = "README.md"
 rust-version = "1.70"
 
 [workspace.dependencies]
-alumy-core = { path = "crates/core", version = "0.1.13", default-features = false }
-alumy-linux = { path = "crates/linux", version = "0.1.13" }
-alumy-bare = { path = "crates/bare", version = "0.1.13", default-features = false }
-alumy-freertos = { path = "crates/freertos", version = "0.1.13", default-features = false }
-alumy-embassy = { path = "crates/embassy", version = "0.1.13", default-features = false }
+alumy-core = { path = "crates/core", version = "0.1.14", default-features = false }
+alumy-linux = { path = "crates/linux", version = "0.1.14" }
+alumy-bare = { path = "crates/bare", version = "0.1.14", default-features = false }
+alumy-freertos = { path = "crates/freertos", version = "0.1.14", default-features = false }
+alumy-embassy = { path = "crates/embassy", version = "0.1.14", default-features = false }
 anyhow = "1.0.100"
 crossbeam = "0.8.4"
 libc = "0.2.180"
@@ -48,6 +52,13 @@ readme.workspace = true
 keywords = ["cross-platform", "sdk", "utilities", "logging", "embedded"]
 categories = ["development-tools", "embedded", "os"]
 rust-version.workspace = true
+exclude = [
+    ".cargo/**",
+    ".claude/**",
+    ".codex/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+]
 
 [dependencies]
 alumy-core = { workspace = true, features = ["alloc"] }

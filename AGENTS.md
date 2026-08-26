@@ -8,6 +8,8 @@
   `crates/embassy`; re-export shared helpers instead of duplicating them.
 - `linux` is the default root feature. MCU consumers disable default features
   and select `bare`, `freertos`, or `embassy`.
+- Keep platform examples as workspace members under `examples`; MCU examples
+  must remain no_std-compatible and independently cross-checkable.
 
 ## Coding Rules
 

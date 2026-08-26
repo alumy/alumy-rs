@@ -6,6 +6,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_target(true)
         .init()?;
 
-    info!("hello from linux");
+    info!("hello from Linux");
     Ok(())
 }

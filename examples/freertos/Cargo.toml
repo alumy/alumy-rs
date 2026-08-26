@@ -1,0 +1,13 @@
+[package]
+name = "alumy-example-freertos"
+version.workspace = true
+edition.workspace = true
+publish = false
+rust-version.workspace = true
+
+[dependencies]
+alumy = { path = "../..", default-features = false, features = ["freertos"] }
+
+[lib]
+test = true
+doctest = false
