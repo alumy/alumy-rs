@@ -1,10 +1,21 @@
-//! Compiles and links a vendored FreeRTOS kernel into this firmware binary.
+//! Compiles and links a vendored FreeRTOS kernel into this firmware binary,
+//! and makes `memory.x` visible to the linker.
 //!
 //! This requires:
 //! 1. A vendored copy of the FreeRTOS kernel source (see README.md for how
 //!    to fetch it) at the path passed to `Builder::freertos` below.
 //! 2. An ARM cross-compiler (e.g. `arm-none-eabi-gcc`) available on PATH.
 //! 3. `src/FreeRTOSConfig.h` filled in for your real target chip.
+//!
+//! cortex-m-rt's own build script emits a `link.x` that does
+//! `INCLUDE memory.x`; the memory.x section below copies our `memory.x`
+//! into `OUT_DIR` and adds that directory to the linker search path so
+//! the include resolves.
+
+use std::env;
+use std::fs::File;
+use std::io::Write;
+use std::path::PathBuf;
 
 fn main() {
     let mut builder = freertos_cargo_build::Builder::new();
@@ -19,4 +30,14 @@ fn main() {
     builder
         .compile()
         .unwrap_or_else(|e| panic!("failed to build FreeRTOS kernel: {e}"));
+
+    let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
+    File::create(out.join("memory.x"))
+        .unwrap()
+        .write_all(include_bytes!("memory.x"))
+        .unwrap();
+    println!("cargo:rustc-link-search={}", out.display());
+
+    println!("cargo:rerun-if-changed=memory.x");
+    println!("cargo:rerun-if-changed=build.rs");
 }

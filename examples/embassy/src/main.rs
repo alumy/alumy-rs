@@ -2,11 +2,10 @@
 #![no_main]
 //! Flashable Embassy firmware entry point built on Alumy's no_std APIs.
 //!
-//! Board bring-up and peripheral HAL selection are intentionally left out:
-//! add an embassy-<chip-family> HAL and its `embassy_time` driver here once
-//! you target a specific chip. This crate only wires up the executor entry
-//! point, a panic handler, and the portable Alumy helpers so it links into
-//! a real ELF for the configured target.
+//! Targets a generic STM32F411 (Cortex-M4F). `embassy_stm32::init` brings
+//! up the chip's clocks and peripherals, which also supplies the
+//! `embassy-time` time driver and the Cortex-M critical-section
+//! implementation this binary links against.
 
 use alumy::embassy::fs;
 use embassy_executor::Spawner;
@@ -15,6 +14,7 @@ use panic_halt as _;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
+    let _peripherals = embassy_stm32::init(Default::default());
     let _buffer_size = fs::filesize::parse_size("16KiB");
 
     loop {

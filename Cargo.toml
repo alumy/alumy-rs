@@ -8,6 +8,12 @@ members = [
 ]
 resolver = "2"
 
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
 [workspace.package]
 version = "0.1.14"
 edition = "2021"
