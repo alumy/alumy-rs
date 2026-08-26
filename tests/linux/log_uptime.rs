@@ -8,6 +8,10 @@ use std::time::Duration;
 
 #[test]
 fn test_log_uptime_format() {
+    if !super::common::run_isolated("test_log_uptime_format") {
+        return;
+    }
+
     let log_dir = "test_logs_uptime_basic";
     let log_file = "test_logs_uptime_basic/test_uptime.log";
 

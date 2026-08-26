@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+#![cfg_attr(target_arch = "arm", no_std)]
+#![cfg_attr(target_arch = "arm", no_main)]
 //! Flashable Embassy firmware entry point built on Alumy's no_std APIs.
 //!
 //! Targets a generic STM32F411 (Cortex-M4F). `embassy_stm32::init` brings
@@ -7,11 +7,16 @@
 //! `embassy-time` time driver and the Cortex-M critical-section
 //! implementation this binary links against.
 
+#[cfg(target_arch = "arm")]
 use alumy::embassy::fs;
+#[cfg(target_arch = "arm")]
 use embassy_executor::Spawner;
+#[cfg(target_arch = "arm")]
 use embassy_time::Timer;
+#[cfg(target_arch = "arm")]
 use panic_halt as _;
 
+#[cfg(target_arch = "arm")]
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     let _peripherals = embassy_stm32::init(Default::default());
@@ -22,3 +27,6 @@ async fn main(_spawner: Spawner) {
         Timer::after_secs(1).await;
     }
 }
+
+#[cfg(not(target_arch = "arm"))]
+fn main() {}

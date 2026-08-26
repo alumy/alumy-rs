@@ -8,6 +8,10 @@ use std::time::Duration;
 
 #[test]
 fn test_log_file_writing() {
+    if !super::common::run_isolated("test_log_file_writing") {
+        return;
+    }
+
     let log_dir = "test_logs_write_basic";
     let log_file = "test_logs_write_basic/test_write.log";
 

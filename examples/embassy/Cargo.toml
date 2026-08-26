@@ -7,6 +7,8 @@ rust-version.workspace = true
 
 [dependencies]
 alumy = { path = "../..", default-features = false, features = ["embassy"] }
+
+[target.'cfg(target_arch = "arm")'.dependencies]
 embassy-executor = { version = "=0.6.3", features = ["arch-cortex-m", "executor-thread", "integrated-timers"] }
 embassy-time = "=0.3.2"
 embassy-stm32 = { version = "0.1", features = ["stm32f411ce", "time-driver-any"] }

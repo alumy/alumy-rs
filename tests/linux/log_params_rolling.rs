@@ -1,6 +1,6 @@
 #![cfg(feature = "linux")]
 
-mod common;
+use super::common;
 use alumy::log::LogConfig;
 use std::fs;
 use std::thread;
@@ -8,6 +8,10 @@ use std::time::Duration;
 
 #[test]
 fn test_log_params_rolling() {
+    if !common::run_isolated("test_log_params_rolling") {
+        return;
+    }
+
     let log_dir = "test_logs_rolling";
     let log_file = "test_logs_rolling/test.log";
     let _guard = common::CleanupGuard(log_dir);

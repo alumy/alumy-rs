@@ -8,11 +8,17 @@
 - Put shared no_std-compatible code under `src/core` and expose it through the
   root `alumy::{fs, version}` API.
 - Put Linux code under `src/linux`; keep MCU platform namespaces in the root
-  crate behind `bare`, `freertos`, and `embassy` features.
+  crate under `src/bare`, `src/freertos`, and `src/embassy`, behind the matching
+  features. These modules are reserved extension points for platform code.
 - `linux` is the default feature. MCU consumers disable default features and
   select `bare`, `freertos`, or `embassy`.
 - Keep platform examples as workspace members under `examples`; MCU examples
-  must remain no_std-compatible and independently cross-checkable.
+  must remain no_std-compatible firmware binaries and independently
+  cross-checkable for their target.
+- Keep integration tests grouped by platform under `tests/linux`, `tests/bare`,
+  `tests/freertos`, and `tests/embassy`. Use the implicit `tests/platform.rs`
+  entry point to enable platform modules by feature; Linux logger tests use
+  child-process isolation for global subscribers.
 
 ## Coding Rules
 

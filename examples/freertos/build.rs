@@ -18,6 +18,11 @@ use std::io::Write;
 use std::path::PathBuf;
 
 fn main() {
+    if env::var("CARGO_CFG_TARGET_ARCH").as_deref() != Ok("arm") {
+        println!("cargo:rerun-if-changed=build.rs");
+        return;
+    }
+
     let mut builder = freertos_cargo_build::Builder::new();
 
     // Path to the vendored FreeRTOS-Kernel source tree (see README.md).

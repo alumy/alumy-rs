@@ -13,13 +13,20 @@ alumy/
 ├── Cargo.toml
 ├── src/
 │   ├── core
-│   └── linux
+│   ├── linux
+│   ├── bare
+│   ├── freertos
+│   └── embassy
 ├── examples/
 │   ├── linux
 │   ├── bare
 │   ├── freertos
 │   └── embassy
-└── tests
+└── tests/
+    ├── linux/
+    ├── bare/
+    ├── freertos/
+    └── embassy/
 ```
 
 ## Platforms
@@ -124,14 +131,15 @@ The `examples` workspace members are compiled by the normal workspace checks:
 
 ```bash
 cargo run -p alumy-example-linux
-cargo check -p alumy-example-bare
-cargo check -p alumy-example-freertos
-cargo check -p alumy-example-embassy
+cargo build -p alumy-example-bare --target thumbv7em-none-eabihf
+cargo build -p alumy-example-freertos --target thumbv7em-none-eabihf
+cargo build -p alumy-example-embassy --target thumbv7em-none-eabihf
 ```
 
-The MCU examples are no_std libraries containing portable application logic.
-Board startup, HAL selection, interrupt vectors, and executor or RTOS bindings
-remain in the target firmware crate.
+The MCU examples are `no_std` firmware binaries. They provide an ARM entry
+point and linker memory layout; update `memory.x` and the board-specific HAL
+configuration for the target chip, then flash the generated ELF with your
+debug probe tool.
 
 ## License
 

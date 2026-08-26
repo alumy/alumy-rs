@@ -7,6 +7,8 @@ rust-version.workspace = true
 
 [dependencies]
 alumy = { path = "../..", default-features = false, features = ["freertos"] }
+
+[target.'cfg(target_arch = "arm")'.dependencies]
 freertos-rust = "0.2"
 cortex-m = "=0.7.7"
 cortex-m-rt = "=0.7.3"
