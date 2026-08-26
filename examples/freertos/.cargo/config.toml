@@ -1,0 +1,7 @@
+[build]
+target = "thumbv7em-none-eabihf"
+
+[target.thumbv7em-none-eabihf]
+rustflags = ["-C", "link-arg=-Tlink.x"]
+# Uncomment and adjust once you have a flashing/debug tool wired up, e.g.:
+# runner = "probe-rs run --chip STM32F411CEUx"

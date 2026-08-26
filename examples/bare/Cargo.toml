@@ -7,7 +7,6 @@ rust-version.workspace = true
 
 [dependencies]
 alumy = { path = "../..", default-features = false, features = ["bare"] }
-
-[lib]
-test = true
-doctest = false
+cortex-m = "=0.7.7"
+cortex-m-rt = "=0.7.3"
+panic-halt = "=0.2.0"

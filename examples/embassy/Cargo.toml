@@ -7,7 +7,8 @@ rust-version.workspace = true
 
 [dependencies]
 alumy = { path = "../..", default-features = false, features = ["embassy"] }
-
-[lib]
-test = true
-doctest = false
+embassy-executor = { version = "=0.6.3", features = ["arch-cortex-m", "executor-thread"] }
+embassy-time = "=0.3.2"
+cortex-m = "=0.7.7"
+cortex-m-rt = "=0.7.3"
+panic-halt = "=0.2.0"
