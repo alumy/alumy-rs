@@ -56,6 +56,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "alloc")]
     fn test_hello() {
         let greeting = hello();
         assert!(greeting.contains("alumy"));

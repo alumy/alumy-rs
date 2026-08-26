@@ -1,3 +1,5 @@
+#![cfg(feature = "linux")]
+
 use alumy::log::LogConfig;
 use std::fs;
 use std::path::Path;

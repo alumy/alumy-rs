@@ -1,3 +1,5 @@
+#![cfg(feature = "linux")]
+
 mod common;
 use alumy::log::LogConfig;
 use std::fs;

@@ -113,6 +113,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "alloc")]
     fn test_format_size() {
         assert_eq!(format_size(512), "512B");
         assert_eq!(format_size(1024), "1.0KB");

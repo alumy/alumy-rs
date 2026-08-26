@@ -1,3 +1,5 @@
+#![cfg(feature = "linux")]
+
 use alumy::sys::uptime::{uptime, uptime_duration};
 
 #[test]
